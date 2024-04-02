@@ -1,6 +1,21 @@
 # DASC_2024
 ## MURDOC: Transforming Pixels into Perception for Camouflage Detection
 
+## Research Questions
+1. How does incorporating off-ramps for eXplainable AI (XAI) output enhance the trustworthiness of the MURDOC application by providing transparent and reliable explanations of the decision-making process?
+2. To what extent does the incorporation of user-driven verification mechanisms within the MURDOC visualization tool improve the trustworthiness of the model's predictions in camouflage detection, allowing users to actively participate in decision-making processes and validate model outputs based on their knowledge and experience? 
+3. How can the integration of advanced model validation techniques, such as advesarial testing and uncertainty quanitification, within the MURDOC framework enhance the model's robustness and reliability in challenging camouflage scenarios, consequently improving the user trust in the model's performance and decision-making capabilities?
+
+## Work Completed
+2024-03-25: Completed the "off-ramps" for XAI output of ResNet50 and RankNet models
+2024-04-01: Visual Studio 2022 C# .NET project created
+
+## TODOS
+1. Add "off-ramps" for XAI output of EfficientDet-D7 model
+2. Complete design utilizing Gestalt principles and xaml coding of MURDOC GUI 
+3. Wire up C# front-end with Python back-end (utilize pythonnet lib)
+4. Incorporate cybersecurity elements to project
+
 ### Abstract
 This paper introduces the Mixed Understanding and Recognition for Detection of Camouflage (MURDOC) project, which aims to enhance explainability in computer vision models, specifically focusing on camouflage detection. The project seeks to develop tools and methodologies to clarify decision-making processes and improve user understanding of camouflaged object detection and segmentation (CODS). Examining the critical necessity for explainability in computer vision, particularly in comprehending the decision-making procedures of machine learning (ML) and artificial intelligence (AI) models, forms the foundation of this research.
 
