@@ -33,20 +33,27 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Left column: Narrow with image file select/browse button and text box -->
+            <!-- Left column: User Controls - Narrow -->
             <StackPanel Grid.Column="0" Orientation="Vertical">
+                <!-- Image file select/browse button and text box -->
                 <StackPanel Orientation="Horizontal">
-                    <TextBox Text="{Binding SelectedImagePath}" Width="200" Margin="5,5,5,5" IsReadOnly="True" />
+                    <TextBox Text="{Binding SelectedImageFileName, Mode=OneWay}" TextWrapping="NoWrap" MinWidth="200" Width="Auto" Margin="5,5,5,5" IsReadOnly="True" />
                     <Button Content="Browse" Command="{Binding BrowseCommand}" Margin="5,5,5,5" />
                 </StackPanel>
+                
+                <!-- TODO: Model controls: Run models to gather prediction and outputs -->
+                
             </StackPanel>
 
             <!-- Middle column: Display the selected image -->
             <Image Grid.Column="1" Source="{Binding SelectedImage}" Stretch="Uniform" />
 
-            <!-- Right column: Placeholder -->
+            <!-- Right column: IAI and XAI Outputs here -->
             <Border Grid.Column="2" Background="LightGray">
-                <!-- Placeholder content goes here -->
+                <!-- TODO: Informative AI (IAI) Output -->
+                
+                <!-- TODO: eXpainable AI (XAI) Output -->
+                
             </Border>
         </Grid>
 

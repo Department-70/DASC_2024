@@ -3,14 +3,17 @@ using System.ComponentModel;
 using System.Windows.Input;
 using Microsoft.Win32;
 using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace MURDOC.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        #region private variables
+        #region Private Variables
 
         private string _selectedImagePath;
+
+        private string _selectedImageFileName;
 
         private BitmapImage _selectedImage;
                 
@@ -46,6 +49,9 @@ namespace MURDOC.ViewModel
 
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string SelectedImagePath
         {
             get { return _selectedImagePath; }
@@ -53,9 +59,26 @@ namespace MURDOC.ViewModel
             {
                 _selectedImagePath = value;
                 OnPropertyChanged(nameof(SelectedImagePath));
+                UpdateSelectedImageFileName(); // Update SelectedImageFileName when SelectedImagePath changes
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string SelectedImageFileName
+        {
+            get { return _selectedImageFileName; }
+            private set
+            {
+                _selectedImageFileName = value;
+                OnPropertyChanged(nameof(SelectedImageFileName));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public BitmapImage SelectedImage
         {
             get { return _selectedImage; }
@@ -66,6 +89,9 @@ namespace MURDOC.ViewModel
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public MainWindowViewModel()
         {
             _exitCommand = new RelayCommand(ExecuteExitCommand);
@@ -74,6 +100,9 @@ namespace MURDOC.ViewModel
             _selectedImageCommand = new RelayCommand(LoadImage);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ExecuteExitCommand()
         {
             Console.WriteLine("In ExecuteExitCommand()");
@@ -82,21 +111,33 @@ namespace MURDOC.ViewModel
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ExecuteNewCommand() 
         { 
             // TODO: Add logic for new command
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ExecuteOpenCommand() 
         { 
             // TODO: Add logic for open command
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ExecuteSaveCommand() 
         { 
             // TODO: Add logic for save command
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ExecuteBrowseCommand() 
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -108,6 +149,9 @@ namespace MURDOC.ViewModel
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void LoadImage()
         {
             if (!string.IsNullOrEmpty(SelectedImagePath))
@@ -115,7 +159,19 @@ namespace MURDOC.ViewModel
                 SelectedImage = new BitmapImage(new Uri(SelectedImagePath));
             }
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        private void UpdateSelectedImageFileName()
+        {
+            SelectedImageFileName = Path.GetFileName(SelectedImagePath);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyName"></param>
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
