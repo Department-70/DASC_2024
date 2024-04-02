@@ -4,7 +4,7 @@ Created on Thu Mar 21 11:53:16 2024
 
 @author: Debra Hogue
 
-Based upon the B2_ResNet class from RankNet - Lv et al.
+Modified B2_ResNet class from RankNet - Lv et al.
 """
 
 import torch.nn as nn

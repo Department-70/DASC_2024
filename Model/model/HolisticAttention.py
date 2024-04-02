@@ -4,7 +4,7 @@ Created on Thu Mar 21 14:23:26 2024
 
 @author: Debra Hogue
 
-Based on HolisticAttention.py from RankNet by Lv et al.
+Modified HolisticAttention.py from RankNet by Lv et al.
 """
 
 import torch

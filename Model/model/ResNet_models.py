@@ -4,7 +4,7 @@ Created on Thu Mar 21 12:38:21 2024
 
 @author: Debra Hogue
 
-Based upon the ResNet_models.py from RankNet by Lv et al.g
+Modified ResNet_models.py from RankNet by Lv et al.g
 """
 
 import torch

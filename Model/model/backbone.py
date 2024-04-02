@@ -4,7 +4,7 @@ Created on Thu Mar 21 14:06:05 2024
 
 @author: Debra Hogue
 
-Based on the backbone.py from RankNet y Lv et al.
+Modified backbone.py from RankNet y Lv et al.
 """
 
 import torch
