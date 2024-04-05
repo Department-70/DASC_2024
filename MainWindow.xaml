@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MURDOC.Utilities"
+        xmlns:local="clr-namespace:MURDOC"
         mc:Ignorable="d"
         Title="Mixed Understanding Recognition and Detection Of Camouflage (MURDOC)" Height="600" Width="800"
         WindowState="Maximized">
@@ -30,31 +30,78 @@
                 <!-- Define three columns with appropriate widths -->
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <!--<ColumnDefinition Width="Auto" />-->
             </Grid.ColumnDefinitions>
 
             <!-- Left column: User Controls - Narrow -->
             <StackPanel Grid.Column="0" Orientation="Vertical" Margin="5">
-                <!-- Image file select/browse button and text box -->
-                <StackPanel Orientation="Horizontal">
-                    <TextBox Text="{Binding SelectedImageFileName, Mode=OneWay}" TextWrapping="NoWrap" MinWidth="200" Width="Auto" Margin="5,5,5,5" IsReadOnly="True" />
-                    <Button Content="Browse" Command="{Binding BrowseCommand}" Margin="5,5,5,5" />
+                <StackPanel Orientation="Vertical" Margin="5" Background="Lightgray">
+                    <!-- Image file select/browse button and text box -->
+                    <Label Content="Select image:"/>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="5, -5, 5, 5">
+                        <TextBox Text="{Binding SelectedImageFileName, Mode=OneWay}" TextWrapping="NoWrap" MinWidth="200" Width="Auto" Margin="5,5,5,5" IsReadOnly="True" />
+                        <Button Content="Browse" Command="{Binding BrowseCommand}" Margin="5,5,5,5" />
+                    </StackPanel>
+
+                    <Image Source="{Binding SelectedImage}" Margin="5" Stretch="Uniform" MaxWidth="200" MaxHeight="300" />
+
+                    <!-- Model controls: Run models to gather prediction and outputs -->
+                    <Button Content="Run Models" Command="{Binding RunCommand}" Margin="75,5,75,5" />
                 </StackPanel>
-                
-                <!-- TODO: Model controls: Run models to gather prediction and outputs -->
+
+                <StackPanel Orientation="Vertical" Margin="5" Background="LightGray">
+                    <Label Content="Model Traversal Progress" FontWeight="Bold"/>
+
+                    <!-- Image - filled circle = completed; empty circle = not yet done -->
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding RN50MPIcircle}"/>
+                        <Label Content="ResNet50" FontWeight="Bold"/>
+                        <Label Content="Model processing intiiated"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding RN50ResultsCircle}"/>
+                        <Label Content="ResNet50 Results" FontWeight="Bold"/>
+                        <Label Content="First model results"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding RNetMPIcircle}"/>
+                        <Label Content="RankNet" FontWeight="Bold"/>
+                        <Label Content="Model processing intiiated"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding RNetResultsCircle}"/>
+                        <Label Content="RankNet Results" FontWeight="Bold"/>
+                        <Label Content="Second model results"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding EDD7MPIcircle}"/>
+                        <Label Content="EfficientDet-D7" FontWeight="Bold"/>
+                        <Label Content="Model processing intiiated"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding EDD7ResultsCircle}"/>
+                        <Label Content="EfficientDet-D7 Results" FontWeight="Bold"/>
+                        <Label Content="Third model results"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="{Binding FinalResultsCircle}"/>
+                        <Label Content="Final Results" FontWeight="Bold"/>
+                        <Label Content="Model traversal complete"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- Middle column: Display the selected image -->
+            <!--<Image Grid.Column="1" Source="{Binding SelectedImage}" Stretch="Uniform" />-->
+            <StackPanel Grid.Column="1" Background="LightGray" Margin="5">
                 
             </StackPanel>
-
-            <!-- Middle column: Display the selected image -->
-            <Image Grid.Column="1" Source="{Binding SelectedImage}" Stretch="Uniform" />
-
-            <!-- Right column: IAI and XAI Outputs here -->
-            <Border Grid.Column="2" Background="LightGray">
-                <!-- TODO: Informative AI (IAI) Output -->
-                
-                <!-- TODO: eXpainable AI (XAI) Output -->
-                
-            </Border>
         </Grid>
 
     </DockPanel>

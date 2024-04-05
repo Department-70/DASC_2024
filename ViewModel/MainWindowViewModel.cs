@@ -29,6 +29,8 @@ namespace MURDOC.ViewModel
 
         private readonly ICommand _selectedImageCommand;
 
+        private readonly ICommand _runCommand;
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -47,10 +49,12 @@ namespace MURDOC.ViewModel
 
         public ICommand SelectedImageCommand => _selectedImageCommand;
 
+        public ICommand RunCommand => _runCommand;
+
         #endregion
 
         /// <summary>
-        /// 
+        /// Getter/Setter for the user selected image path.
         /// </summary>
         public string SelectedImagePath
         {
@@ -64,7 +68,7 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
-        /// 
+        /// Getter/Setter for the user selected image file name.
         /// </summary>
         public string SelectedImageFileName
         {
@@ -77,7 +81,7 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
-        /// 
+        /// Returns the user selected image to be displayed on the GUI.
         /// </summary>
         public BitmapImage SelectedImage
         {
@@ -89,8 +93,32 @@ namespace MURDOC.ViewModel
             }
         }
 
+        private string _rn50MPIcircle = "Resources/empty_circle.png";
+        public string RN50MPIcircle
+        {
+            get { return _rn50MPIcircle; }
+            set
+            {
+                _rn50MPIcircle = value;
+                OnPropertyChanged(nameof(RN50MPIcircle));
+            }
+        }
+
+        private string _rn50ModelStatus;
+
+        public string RN50ModelStatus
+        {
+            get { return _rn50ModelStatus; }
+            set
+            {
+                _rn50ModelStatus = value;
+                UpdateStepCompletionStatus(); // Update step completion status when model status changes
+                OnPropertyChanged(nameof(RN50ModelStatus));
+            }
+        }
+
         /// <summary>
-        /// 
+        /// Constructor
         /// </summary>
         public MainWindowViewModel()
         {
@@ -101,7 +129,7 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
-        /// 
+        /// Closes the application.
         /// </summary>
         private void ExecuteExitCommand()
         {
@@ -136,7 +164,7 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
-        /// 
+        /// Executes the BrowseCommand to open a file dialog for selecting an image file.
         /// </summary>
         private void ExecuteBrowseCommand() 
         {
@@ -152,6 +180,14 @@ namespace MURDOC.ViewModel
         /// <summary>
         /// 
         /// </summary>
+        private void ExecuteRunCommand()
+        {
+
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path.
+        /// </summary>
         private void LoadImage()
         {
             if (!string.IsNullOrEmpty(SelectedImagePath))
@@ -161,17 +197,34 @@ namespace MURDOC.ViewModel
         }
         
         /// <summary>
-        /// 
+        /// Updates the GUI to display the user selected image file name
         /// </summary>
         private void UpdateSelectedImageFileName()
         {
             SelectedImageFileName = Path.GetFileName(SelectedImagePath);
         }
 
+        // In a method where you determine the completion status of each step, set the appropriate image source:
+        private void UpdateStepCompletionStatus()
+        {
+            // Example logic (replace with your actual logic):
+            bool rn50Completed = IsRN50ModelCompleted();
+            RN50MPIcircle = rn50Completed ? "Resources/filled_circle.png" : "Resources/empty_circle.png";
+
+            // Update other step completion properties similarly...
+        }
+
+        // Assuming you have a method to determine the completion status of each step:
+        private bool IsRN50ModelCompleted()
+        {
+            // Example logic to determine if RN50 model is completed
+            return _rn50ModelStatus == "Completed";
+        }
+
         /// <summary>
-        /// 
+        /// Invokes the PropertyChanged event to notify subscribers of a property change.
         /// </summary>
-        /// <param name="propertyName"></param>
+        /// <param name="propertyName">The name of the property that changed.</param>
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
