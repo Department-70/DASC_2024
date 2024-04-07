@@ -100,7 +100,46 @@
             <!-- Middle column: Display the selected image -->
             <!--<Image Grid.Column="1" Source="{Binding SelectedImage}" Stretch="Uniform" />-->
             <StackPanel Grid.Column="1" Background="LightGray" Margin="5">
-                
+                <Label Content="Model Traversal Results" FontWeight="Bold"/>
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <Label Content="Input" Margin="10,0,0,0"/>
+                    <Image Source="{Binding SelectedImage}" Margin="15,0,0,0" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <Label Content="ResNet50" Margin="10,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                        <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <Label Content="RankNet" Margin="10,0,0,0"/>
+                    <StackPanel Orientation="Vertical" Margin="10,0,0,0">
+                        <Label Content="Localization" Margin="10,0,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                            <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
+                        <Label Content="Ranking" Margin="10,0,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                            <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <Label Content="EfficientDet-D7" Margin="10,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                        <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="5">
+                    <Label Content="Final Prediction" Margin="10,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
+                        <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
         </Grid>
 
