@@ -12,12 +12,12 @@ namespace MURDOC.ViewModel
     {
         #region Private Variables
 
-        private string _selectedImagePath;
+        private string _selectedImagePath = "Assets/image_placeholder.png";
 
         private string _selectedImageFileName;
 
         private BitmapImage _selectedImage;
-                
+
         private readonly ICommand _exitCommand;
 
         private readonly ICommand _newCommand;
@@ -67,7 +67,7 @@ namespace MURDOC.ViewModel
                 UpdateSelectedImageFileName(); // Update SelectedImageFileName when SelectedImagePath changes
             }
         }
-
+                
         /// <summary>
         /// Getter/Setter for the user selected image file name.
         /// </summary>
@@ -98,6 +98,7 @@ namespace MURDOC.ViewModel
             }
         }
 
+        #region Model Traversal Progress circles
         private string _rn50MPIcircle = "Assets/empty_circle.png";
         public string RN50MPIcircle
         {
@@ -187,6 +188,7 @@ namespace MURDOC.ViewModel
                 OnPropertyChanged(nameof(RN50ModelStatus));
             }
         }
+        #endregion
 
         /// <summary>
         /// Constructor
@@ -215,7 +217,7 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteNewCommand() 
         { 
-            // TODO: Add logic for new command
+            // TODO: Add logic for new command - reset everything on the screen
         }
 
         /// <summary>
@@ -231,7 +233,7 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteSaveCommand() 
         { 
-            // TODO: Add logic for save command
+            // TODO: Add logic for save command - Save the models 'visualization' as a PDF
         }
 
         /// <summary>
@@ -249,7 +251,7 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
-        /// 
+        /// Run the FACE model (submodels include ResNet50, RankNet, and EfficientDet-D7)
         /// </summary>
         private void ExecuteRunCommand()
         {
@@ -269,10 +271,16 @@ namespace MURDOC.ViewModel
                 // Call the process_image_with_resnet50 function from your Python script
                 script.process_image_with_resnet50(SelectedImagePath);
 
-                // TODO: Set RN50MPIcircle to green circle
+                // Update the RN50MPIcircle to green circle to show model has ran
                 RN50MPIcircle = "Assets/filled_circle.png";
 
                 // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
+
+                // TODO: Run the RankNet model
+
+                // TODO: Run the EfficientDetD7 model
+
+                // TODO: Display the final prediction
             }
         }
 
