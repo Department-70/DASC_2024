@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Model\XAI_ResNet50.py" />
     <Resource Include="Assets\image_placeholder.png" />
     <Resource Include="Assets\empty_circle.png" />
     <Resource Include="Assets\filled_circle.png" />

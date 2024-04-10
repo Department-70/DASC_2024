@@ -4,6 +4,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using System.Windows.Media.Imaging;
 using System.IO;
+using Python.Runtime;
 
 namespace MURDOC.ViewModel
 {
@@ -90,10 +91,14 @@ namespace MURDOC.ViewModel
             {
                 _selectedImage = value;
                 OnPropertyChanged(nameof(SelectedImage));
+
+                // TODO: Reset all Model Traversal Progress circles to empty
+
+                // TODO: Clear all of the Model Traversal Results - except for Input Image
             }
         }
 
-        private string _rn50MPIcircle = "Resources/empty_circle.png";
+        private string _rn50MPIcircle = "Assets/empty_circle.png";
         public string RN50MPIcircle
         {
             get { return _rn50MPIcircle; }
@@ -101,6 +106,72 @@ namespace MURDOC.ViewModel
             {
                 _rn50MPIcircle = value;
                 OnPropertyChanged(nameof(RN50MPIcircle));
+            }
+        }
+
+        private string _rn50ResultsCircle = "Assets/empty_circle.png";
+        public string RN50ResultsCircle
+        {
+            get { return _rn50ResultsCircle; }
+            set
+            {
+                _rn50ResultsCircle = value;
+                OnPropertyChanged(nameof(RN50ResultsCircle));
+            }
+        }
+
+        private string _rNetMPIcircle = "Assets/empty_circle.png";
+        public string RNetMPIcircle
+        {
+            get { return _rNetMPIcircle; }
+            set
+            {
+                _rNetMPIcircle = value;
+                OnPropertyChanged(nameof(RNetMPIcircle));
+            }
+        }
+
+        private string _rNetResultsCircle = "Assets/empty_circle.png";
+        public string RNetResultsCircle
+        {
+            get { return _rNetResultsCircle; }
+            set
+            {
+                _rNetResultsCircle = value;
+                OnPropertyChanged(nameof(RNetResultsCircle));
+            }
+        }
+
+        private string _eDD7MPICircle = "Assets/empty_circle.png";
+        public string EDD7MPIcircle
+        {
+            get { return _eDD7MPICircle; }
+            set
+            {
+                _eDD7MPICircle = value;
+                OnPropertyChanged(nameof(EDD7MPIcircle));
+            }
+        }
+
+        private string _eDD7ResultsCircle = "Assets/empty_circle.png";
+        public string EDD7ResultsCircle
+        {
+            get { return _eDD7ResultsCircle; }
+            set
+            {
+                _eDD7ResultsCircle = value;
+                OnPropertyChanged(nameof(EDD7ResultsCircle));
+            }
+        }
+
+        private string _finalResultCircle = "Assets/empty_circle.png";
+        public string FinalResultsCircle
+        {
+            get { return _finalResultCircle; }
+            set
+            {
+                _finalResultCircle = value;
+                OnPropertyChanged(nameof(FinalResultsCircle));
             }
         }
 
@@ -182,13 +253,33 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteRunCommand()
         {
+            // Initialize Python engine
+            using (Py.GIL())
+            {
+                dynamic sys = Py.Import("sys");
+                dynamic os = Py.Import("os");
 
+                // Add the directory containing your Python script to Python's sys.path
+                string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Model", "XAI_ResNet50.py");
+                sys.path.append(os.path.dirname(scriptPath));
+
+                // Import your Python script module
+                dynamic script = Py.Import("XAI_ResNet50");
+
+                // Call the process_image_with_resnet50 function from your Python script
+                script.process_image_with_resnet50(SelectedImagePath);
+
+                // TODO: Set RN50MPIcircle to green circle
+                RN50MPIcircle = "Assets/filled_circle.png";
+
+                // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
+            }
         }
 
-        /// <summary>
-        /// Loads an image from the user selected image path.
-        /// </summary>
-        private void LoadImage()
+            /// <summary>
+            /// Loads an image from the user selected image path.
+            /// </summary>
+            private void LoadImage()
         {
             if (!string.IsNullOrEmpty(SelectedImagePath))
             {
