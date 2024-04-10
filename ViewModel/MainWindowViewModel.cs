@@ -12,8 +12,6 @@ namespace MURDOC.ViewModel
     {
         #region Private Variables
 
-        private string _selectedImagePath = "Assets/image_placeholder.png";
-
         private string _selectedImageFileName;
 
         private BitmapImage _selectedImage;
@@ -53,6 +51,8 @@ namespace MURDOC.ViewModel
         public ICommand RunCommand => _runCommand;
 
         #endregion
+
+        private string _selectedImagePath;
 
         /// <summary>
         /// Getter/Setter for the user selected image path.
@@ -195,6 +195,8 @@ namespace MURDOC.ViewModel
         /// </summary>
         public MainWindowViewModel()
         {
+            SelectedImagePath = "Assets/image_placeholder.png";
+           
             _exitCommand = new RelayCommand(ExecuteExitCommand);
 
             _browseCommand = new RelayCommand(ExecuteBrowseCommand);
@@ -300,7 +302,10 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void UpdateSelectedImageFileName()
         {
-            SelectedImageFileName = Path.GetFileName(SelectedImagePath);
+            if (SelectedImagePath != "Assets/image_placeholder.png")
+            {
+                SelectedImageFileName = Path.GetFileName(SelectedImagePath);
+            }
         }
 
         // In a method where you determine the completion status of each step, set the appropriate image source:
