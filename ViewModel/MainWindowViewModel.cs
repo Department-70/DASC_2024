@@ -195,7 +195,7 @@ namespace MURDOC.ViewModel
         /// </summary>
         public MainWindowViewModel()
         {
-            SelectedImagePath = "Assets/image_placeholder.png";
+            LoadImage();
            
             _exitCommand = new RelayCommand(ExecuteExitCommand);
 
@@ -286,17 +286,22 @@ namespace MURDOC.ViewModel
             }
         }
 
-            /// <summary>
-            /// Loads an image from the user selected image path.
-            /// </summary>
-            private void LoadImage()
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadImage()
         {
             if (!string.IsNullOrEmpty(SelectedImagePath))
             {
                 SelectedImage = new BitmapImage(new Uri(SelectedImagePath));
             }
+            else
+            {
+                // Set the default placeholder image
+                SelectedImage = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
         }
-        
+
         /// <summary>
         /// Updates the GUI to display the user selected image file name
         /// </summary>
