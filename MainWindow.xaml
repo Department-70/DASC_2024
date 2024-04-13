@@ -56,7 +56,7 @@
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="{Binding RN50MPIcircle}"/>
                         <Label Content="ResNet50" FontWeight="Bold"/>
-                        <Label Content="Model processing intiiated"/>
+                        <Label Content="Model processing initiated"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="5">
@@ -68,7 +68,7 @@
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="{Binding RNetMPIcircle}"/>
                         <Label Content="RankNet" FontWeight="Bold"/>
-                        <Label Content="Model processing intiiated"/>
+                        <Label Content="Model processing initiated"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="5">
@@ -80,7 +80,7 @@
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="{Binding EDD7MPIcircle}"/>
                         <Label Content="EfficientDet-D7" FontWeight="Bold"/>
-                        <Label Content="Model processing intiiated"/>
+                        <Label Content="Model processing initiated"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="5">

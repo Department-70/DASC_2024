@@ -125,6 +125,16 @@ def predict_function(images):
     outputs = xai_resnet50_model(images_tensor)
     return outputs.detach().numpy()
 
+# Define a function to predict using the ResNet50 model
+def predict_function(images, xai_resnet50_model):
+    # Make a copy of the NumPy array
+    images_copy = np.copy(images)
+
+    # Images should be in the shape (num_samples, height, width, num_channels)
+    images_tensor = torch.Tensor(images_copy).permute(0, 3, 1, 2)
+    outputs = xai_resnet50_model(images_tensor)
+    return outputs.detach().numpy()
+
 # Additional transform function to convert PyTorch tensor to PIL Image
 def to_pil_image(tensor):
     return transforms.ToPILImage()(tensor)
@@ -160,7 +170,7 @@ def process_image_with_resnet50(image_path):
         plt.close()  # Close the plot
 
     # Get predictions
-    predictions = predict_function(np.expand_dims(original_image_pil, 0))
+    predictions = predict_function(np.expand_dims(original_image_pil, 0), xai_resnet50_model)
     heatmap = predictions[0]
     
     # Resize and normalize heatmap

@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Windows.Input;
-using Microsoft.Win32;
-using System.Windows.Media.Imaging;
-using System.IO;
+﻿using Microsoft.Win32;
 using Python.Runtime;
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace MURDOC.ViewModel
 {
@@ -67,7 +67,7 @@ namespace MURDOC.ViewModel
                 UpdateSelectedImageFileName(); // Update SelectedImageFileName when SelectedImagePath changes
             }
         }
-                
+
         /// <summary>
         /// Getter/Setter for the user selected image file name.
         /// </summary>
@@ -196,11 +196,13 @@ namespace MURDOC.ViewModel
         public MainWindowViewModel()
         {
             LoadImage();
-           
+
             _exitCommand = new RelayCommand(ExecuteExitCommand);
 
             _browseCommand = new RelayCommand(ExecuteBrowseCommand);
             _selectedImageCommand = new RelayCommand(LoadImage);
+
+            _runCommand = new RelayCommand(ExecuteRunCommand);
         }
 
         /// <summary>
@@ -217,31 +219,31 @@ namespace MURDOC.ViewModel
         /// <summary>
         /// 
         /// </summary>
-        private void ExecuteNewCommand() 
-        { 
+        private void ExecuteNewCommand()
+        {
             // TODO: Add logic for new command - reset everything on the screen
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void ExecuteOpenCommand() 
-        { 
+        private void ExecuteOpenCommand()
+        {
             // TODO: Add logic for open command
         }
 
         /// <summary>
         /// 
         /// </summary>
-        private void ExecuteSaveCommand() 
-        { 
+        private void ExecuteSaveCommand()
+        {
             // TODO: Add logic for save command - Save the models 'visualization' as a PDF
         }
 
         /// <summary>
         /// Executes the BrowseCommand to open a file dialog for selecting an image file.
         /// </summary>
-        private void ExecuteBrowseCommand() 
+        private void ExecuteBrowseCommand()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
@@ -257,21 +259,36 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteRunCommand()
         {
+            // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected
+
             // Initialize Python engine
+            if (!PythonEngine.IsInitialized)
+            {
+                InitializePythonEngine();
+            }
+
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
                 dynamic os = Py.Import("os");
 
                 // Add the directory containing your Python script to Python's sys.path
-                string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Model", "XAI_ResNet50.py");
+                string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Model", "XAI_ResNet50.py");
                 sys.path.append(os.path.dirname(scriptPath));
 
-                // Import your Python script module
-                dynamic script = Py.Import("XAI_ResNet50");
+                try
+                {
+                    // Import your Python script module
+                    dynamic script = Py.Import("XAI_ResNet50");
 
-                // Call the process_image_with_resnet50 function from your Python script
-                script.process_image_with_resnet50(SelectedImagePath);
+                    // Call the process_image_with_resnet50 function from your Python script
+                    script.process_image_with_resnet50(SelectedImagePath);
+                }
+                catch (PythonException exception)
+                {
+                    // Probably should indicate somewhere on the GUI that something went wrong
+                    Console.WriteLine("Exception occured: " + exception);
+                }
 
                 // Update the RN50MPIcircle to green circle to show model has ran
                 RN50MPIcircle = "Assets/filled_circle.png";
@@ -284,6 +301,17 @@ namespace MURDOC.ViewModel
 
                 // TODO: Display the final prediction
             }
+        }
+
+        /// <summary>
+        /// Initializes Python Engine with the default Visual Studio Python DLL location
+        /// </summary>
+        private void InitializePythonEngine()
+        {
+            string pythonDll = @"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\python39.dll";
+            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
+            // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
+            PythonEngine.Initialize();
         }
 
         /// <summary>
