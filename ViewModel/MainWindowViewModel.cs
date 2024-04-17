@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using Python.Runtime;
+using Python.Runtime; // Ensure this namespace is recognized without errors
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -12,7 +12,9 @@ namespace MURDOC.ViewModel
     {
         #region Private Variables
 
-        private string _selectedImageFileName;
+        private string _selectedImageFileName;  // filename with file type
+
+        private string _selectedImageName;      // filename without file type
 
         private BitmapImage _selectedImage;
 
@@ -65,6 +67,9 @@ namespace MURDOC.ViewModel
                 _selectedImagePath = value;
                 OnPropertyChanged(nameof(SelectedImagePath));
                 UpdateSelectedImageFileName(); // Update SelectedImageFileName when SelectedImagePath changes
+
+                // Enable or disable the Run button based on whether an image is selected
+                IsRunButtonEnabled = !string.IsNullOrEmpty(value);
             }
         }
 
@@ -73,11 +78,24 @@ namespace MURDOC.ViewModel
         /// </summary>
         public string SelectedImageFileName
         {
-            get { return _selectedImageFileName; }
+            get => _selectedImageFileName; 
             private set
             {
                 _selectedImageFileName = value;
                 OnPropertyChanged(nameof(SelectedImageFileName));
+            }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the user selected image file name without the file extension.
+        /// </summary>
+        public string SelectedImageName
+        {
+            get => _selectedImageName;
+            private set
+            {
+                _selectedImageName = value;
+                OnPropertyChanged(nameof(SelectedImageName));
             }
         }
 
@@ -95,6 +113,68 @@ namespace MURDOC.ViewModel
                 // TODO: Reset all Model Traversal Progress circles to empty
 
                 // TODO: Clear all of the Model Traversal Results - except for Input Image
+            }
+        }
+
+        public BitmapImage NoSelectedImage
+        {
+            get { return new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png")); ; }
+            set { }
+        }
+
+        #region ResNet50 Off-Ramp Images
+        /// <summary>
+        /// Setter will set the appropriate off-ramp images dependant on:
+        ///         (1) if the model has run
+        ///         (2) if the off-ramp image exists in the appropriate folder
+        /// </summary>
+        private BitmapImage _resNet50ConvImage;
+        public BitmapImage ResNet50Conv
+        {
+            get { return _resNet50ConvImage; }
+            set
+            {
+                // Get the file name from the SelectedImageName folder
+                string folderPath = Path.Combine("bin", "x64", "Debug", "resnet50_output", _selectedImageName);
+
+                if (Directory.Exists(folderPath))
+                {
+                    string imagePath = Path.Combine(folderPath, _selectedImageName, "_initial_conv_feature_map.png");
+                    if (File.Exists(imagePath))
+                    {
+                        // Load the image and set it to _resNet50ConvImage
+                        _resNet50ConvImage = new BitmapImage(new Uri(imagePath));
+                    }
+                    else
+                    {
+                        // Handle case when image file doesn't exist
+                        // For example, set a default image or show a message
+                    }
+                }
+                else
+                {
+                    // Handle case when folder doesn't exist
+                    // For example, set a default image or show a message
+                }
+
+                OnPropertyChanged(nameof(ResNet50Conv));
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Disables/Enables the Run button 
+        /// Relies upon if a user selects an image or not
+        /// </summary>
+        private bool _isRunButtonEnabled;
+        public bool IsRunButtonEnabled
+        {
+            get { return _isRunButtonEnabled; }
+            set
+            {
+                _isRunButtonEnabled = value;
+                OnPropertyChanged(nameof(IsRunButtonEnabled));
             }
         }
 
@@ -195,6 +275,8 @@ namespace MURDOC.ViewModel
         /// </summary>
         public MainWindowViewModel()
         {
+            IsRunButtonEnabled = false; // Disable Run button initially
+
             LoadImage();
 
             _exitCommand = new RelayCommand(ExecuteExitCommand);
@@ -308,10 +390,25 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void InitializePythonEngine()
         {
-            string pythonDll = @"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\python39.dll";
-            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
-            // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
-            PythonEngine.Initialize();
+            try
+            {
+                string pythonDll = @"C:\Users\pharm\AppData\Local\Programs\Python\Python39\python39.dll";
+                Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
+
+                // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
+                PythonEngine.Initialize();
+            }
+            catch (TypeInitializationException tiex)
+            {
+                // Log or display the type initialization exception message and inner exception
+                Console.WriteLine("Type Initialization Exception: " + tiex.Message);
+                Console.WriteLine("Inner Exception: " + tiex.InnerException?.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log or display any other exceptions during initialization
+                Console.WriteLine("Error initializing Python engine: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -338,6 +435,7 @@ namespace MURDOC.ViewModel
             if (SelectedImagePath != "Assets/image_placeholder.png")
             {
                 SelectedImageFileName = Path.GetFileName(SelectedImagePath);
+                SelectedImageName = Path.GetFileNameWithoutExtension(SelectedImagePath);
             }
         }
 

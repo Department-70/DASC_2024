@@ -46,7 +46,7 @@
                     <Image Source="{Binding SelectedImage}" Margin="5" Stretch="Uniform" MaxWidth="200" MaxHeight="300" />
 
                     <!-- Model controls: Run models to gather prediction and outputs -->
-                    <Button Content="Run Models" Command="{Binding RunCommand}" Margin="75,5,75,5" />
+                    <Button Content="Run Models" Command="{Binding RunCommand}" IsEnabled="{Binding IsRunButtonEnabled}" Margin="75,5,75,5" />
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Margin="5" Background="LightGray">
@@ -128,11 +128,11 @@
                     <StackPanel Orientation="Vertical" Margin="10,0,0,0">
                         <Label Content="Localization" Margin="10,0,0,0"/>
                         <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                            <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                            <Image Source="{Binding NoSelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
                         </StackPanel>
                         <Label Content="Ranking" Margin="10,0,0,0"/>
                         <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                            <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                            <Image Source="{Binding NoSelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
@@ -140,14 +140,14 @@
                 <StackPanel Orientation="Vertical" Margin="5">
                     <Label Content="EfficientDet-D7" Margin="10,0,0,0"/>
                     <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                        <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <Image Source="{Binding NoSelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
                     </StackPanel>
                 </StackPanel>
 
                 <StackPanel Orientation="Vertical" Margin="5">
                     <Label Content="Final Prediction" Margin="10,0,0,0"/>
                     <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                        <Image Source="{Binding SelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <Image Source="{Binding NoSelectedImage}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
