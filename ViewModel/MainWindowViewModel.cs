@@ -128,6 +128,17 @@ namespace MURDOC.ViewModel
         ///         (1) if the model has run
         ///         (2) if the off-ramp image exists in the appropriate folder
         /// </summary>
+        private string _resNet50ConvImagePath;
+        public string ResNet50ConvImagePath
+        {
+            get { return _resNet50ConvImagePath; }
+            set
+            {
+                _resNet50ConvImagePath = value;
+                OnPropertyChanged(nameof(ResNet50ConvImagePath));
+            }
+        }
+
         private BitmapImage _resNet50ConvImage;
         public BitmapImage ResNet50Conv
         {
@@ -135,26 +146,40 @@ namespace MURDOC.ViewModel
             set
             {
                 // Get the file name from the SelectedImageName folder
-                string folderPath = Path.Combine("bin", "x64", "Debug", "resnet50_output", _selectedImageName);
+                string folderPath;
+                if (!string.IsNullOrEmpty(_selectedImageName))
+                {
+                    folderPath = Path.Combine("bin", "x64", "Debug", "resnet50_output", _selectedImageName);
+                    Console.WriteLine(folderPath);
+                }
+                else
+                {
+                    // Handle case when _selectedImageName is null or empty
+                    folderPath = string.Empty;  // Or set it to a default value or handle the case as needed
+                }
 
                 if (Directory.Exists(folderPath))
                 {
-                    string imagePath = Path.Combine(folderPath, _selectedImageName, "_initial_conv_feature_map.png");
+                    string imagePath = Path.Combine(folderPath, _selectedImageName + "_initial_conv_feature_map.png");
+                    Console.WriteLine(imagePath);
+
                     if (File.Exists(imagePath))
                     {
-                        // Load the image and set it to _resNet50ConvImage
-                        _resNet50ConvImage = new BitmapImage(new Uri(imagePath));
+                        // Set the image path to trigger UI update
+                        ResNet50ConvImagePath = imagePath;
                     }
                     else
                     {
                         // Handle case when image file doesn't exist
-                        // For example, set a default image or show a message
+                        // Set the default placeholder image path
+                        ResNet50ConvImagePath = "pack://application:,,,/MURDOC;component/Assets/image_placeholder.png";
                     }
                 }
                 else
                 {
                     // Handle case when folder doesn't exist
-                    // For example, set a default image or show a message
+                    // Set the default placeholder image
+                    ResNet50ConvImagePath = "pack://application:,,,/MURDOC;component/Assets/image_placeholder.png";
                 }
 
                 OnPropertyChanged(nameof(ResNet50Conv));
@@ -279,6 +304,8 @@ namespace MURDOC.ViewModel
 
             LoadImage();
 
+            LoadResNet50ConvImage();
+
             _exitCommand = new RelayCommand(ExecuteExitCommand);
 
             _browseCommand = new RelayCommand(ExecuteBrowseCommand);
@@ -358,13 +385,20 @@ namespace MURDOC.ViewModel
                 string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Model", "XAI_ResNet50.py");
                 sys.path.append(os.path.dirname(scriptPath));
 
+                // ResNet50
                 try
                 {
                     // Import your Python script module
                     dynamic script = Py.Import("XAI_ResNet50");
 
+                    // Update the RN50MPIcircle to green circle to show model is running
+                    RN50MPIcircle = "Assets/filled_circle.png";
+
                     // Call the process_image_with_resnet50 function from your Python script
                     script.process_image_with_resnet50(SelectedImagePath);
+
+                    // TODO: Load the Off-ramp images
+                    LoadResNet50ConvImage();
                 }
                 catch (PythonException exception)
                 {
@@ -372,8 +406,8 @@ namespace MURDOC.ViewModel
                     Console.WriteLine("Exception occured: " + exception);
                 }
 
-                // Update the RN50MPIcircle to green circle to show model has ran
-                RN50MPIcircle = "Assets/filled_circle.png";
+                // Update the RN50ResultsCircle to green circle to show the model is done
+                RN50ResultsCircle = "Assets/filled_circle.png";
 
                 // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
 
@@ -424,6 +458,22 @@ namespace MURDOC.ViewModel
             {
                 // Set the default placeholder image
                 SelectedImage = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50ConvImage()
+        {
+            if (!string.IsNullOrEmpty(ResNet50ConvImagePath))
+            {
+                ResNet50Conv = new BitmapImage(new Uri(ResNet50ConvImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Conv = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
             }
         }
 
