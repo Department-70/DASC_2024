@@ -279,6 +279,37 @@ namespace MURDOC.ViewModel
                 }
             }
         }
+
+        private BitmapImage _resNet50Output;
+        public BitmapImage ResNet50Output
+        {
+            get => _resNet50Output;
+            set
+            {
+                if (_resNet50Output != value)
+                {
+                    _resNet50Output = value;
+                    OnPropertyChanged(nameof(ResNet50Output));
+                }
+            }
+        }
+
+        private string _resNet50OutputImagePath;
+        public string ResNet50OutputImagePath
+        {
+            get => _resNet50OutputImagePath;
+            set
+            {
+                if (_resNet50OutputImagePath != value)
+                {
+                    _resNet50OutputImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50OutputImagePath));
+
+                    // Load and set the image directly to ResNet50Layer4
+                    LoadResNet50OutputImage();
+                }
+            }
+        }
         #endregion
 
         /// <summary>
@@ -402,6 +433,7 @@ namespace MURDOC.ViewModel
             LoadResNet50Layer2Image();
             LoadResNet50Layer3Image();
             LoadResNet50Layer4Image();
+            LoadResNet50OutputImage();
 
             _exitCommand = new RelayCommand(ExecuteExitCommand);
 
@@ -465,6 +497,9 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteRunCommand()
         {
+            // Update the RN50MPIcircle to green circle to show model is running
+            RN50MPIcircle = "Assets/filled_circle.png";
+
             // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected
 
             // Initialize Python engine
@@ -486,10 +521,7 @@ namespace MURDOC.ViewModel
                 try
                 {
                     // Import your Python script module
-                    dynamic script = Py.Import("XAI_ResNet50");
-
-                    // Update the RN50MPIcircle to green circle to show model is running
-                    RN50MPIcircle = "Assets/filled_circle.png";
+                    dynamic script = Py.Import("XAI_ResNet50");                   
 
                     // Call the process_image_with_resnet50 function from your Python script
                     script.process_image_with_resnet50(SelectedImagePath);
@@ -519,6 +551,10 @@ namespace MURDOC.ViewModel
                     string layer4ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer4_block1_feature_map.png");
                     ResNet50Layer4ImagePath = layer4ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer4));
+
+                    string outputImagePath = Path.Combine(folderPath, _selectedImageName + "_prediction.png");
+                    ResNet50OutputImagePath = outputImagePath;
+                    OnPropertyChanged(nameof(ResNet50Output));
                 }
                 catch (PythonException exception)
                 {
@@ -659,6 +695,22 @@ namespace MURDOC.ViewModel
             {
                 // Set the default placeholder image
                 ResNet50Layer4 = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50OutputImage()
+        {
+            if (!string.IsNullOrEmpty(ResNet50OutputImagePath))
+            {
+                ResNet50Output = new BitmapImage(new Uri(ResNet50OutputImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Output = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
             }
         }
 
