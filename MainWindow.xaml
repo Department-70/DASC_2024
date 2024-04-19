@@ -111,13 +111,13 @@
                     <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
                         <Image Source="{Binding ResNet50Conv}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
 
-                        <Image Source="{Binding ResNet50Block1}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <Image Source="{Binding ResNet50BLayer1}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
 
-                        <Image Source="{Binding ResNet50Block2}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <Image Source="{Binding ResNet50BLayer2}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
 
-                        <Image Source="{Binding ResNet50Block3}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <Image Source="{Binding ResNet50BLayer3}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
 
-                        <Image Source="{Binding ResNet50Block4}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <Image Source="{Binding ResNet50Layer4}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
 
                         <Image Source="{Binding ResNet50Output}" Margin="0,0,0,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
                     </StackPanel>

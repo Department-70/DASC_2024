@@ -86,10 +86,6 @@ class XAIResNet50(torch.nn.Module):
         # Global average pooling layer
         features = F.adaptive_avg_pool2d(features, (1, 1))
         
-        # Save images after the global averaging pool
-        # 6th "Off-ramp"
-        self.feature_maps['global_averaging_pool_layer'] = features.clone().detach()
-
         # Fully connected layer (Output layer)
         features = torch.flatten(features, 1)
         output = self.resnet50.fc(features)
@@ -162,12 +158,14 @@ def process_image_with_resnet50(image_path):
     
     # Save feature maps
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
-        plt.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  
-        plt.title(f"Feature Map - {key}")
-        plt.axis('off')
+        fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
+        ax.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
+        ax.axis('off')
+
+        # Save the plot without title
         output_path = f'{prediction_output_location}/{file_name}_{key}_feature_map.png'
-        plt.savefig(output_path)
-        plt.close()  # Close the plot
+        fig.savefig(output_path, bbox_inches='tight', pad_inches=0)
+        plt.close(fig)  # Close the figure to free up memory
 
     # Get predictions
     predictions = predict_function(np.expand_dims(original_image_pil, 0), xai_resnet50_model)
@@ -243,14 +241,14 @@ if __name__ == "__main__":
         # Visualize or save the feature maps as needed
         # for key, feature_map in feature_maps.items():
         for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
-            plt.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
-            plt.title(f"Feature Map - {key}")
-            plt.axis('off')
-            
-            # Save the plot
+            fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
+            ax.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
+            ax.axis('off')
+
+            # Save the plot without title
             output_path = f'{prediction_output_location}/{file_name}_{key}_feature_map.png'
-            plt.savefig(output_path)
-            plt.close() # Close the plt to free up memory
+            fig.savefig(output_path, bbox_inches='tight', pad_inches=0)
+            plt.close(fig)  # Close the figure to free up memory
                                 
         # Use the predict_function to get predictions
         predictions = predict_function(np.expand_dims(original_image_pil, 0))
