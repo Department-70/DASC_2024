@@ -182,6 +182,13 @@ def process_image_with_resnet50(image_path):
     overlay_image = (heatmap_rgb * 255).astype(np.uint8)
     final_image = cv2.addWeighted(original_image, 0.4, overlay_image, 0.6, 0)
     
+    # Save the final prediction image
+    plt.imshow(final_image)
+    plt.axis('off')
+    output_path = f'{prediction_output_location}/{file_name}_prediction.png'
+    plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
+    plt.close()  # Close the plot
+    
     return final_image
 
 """
