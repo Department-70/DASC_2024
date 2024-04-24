@@ -500,7 +500,7 @@ namespace MURDOC.ViewModel
             // Update the RN50MPIcircle to green circle to show model is running
             RN50MPIcircle = "Assets/filled_circle.png";
 
-            // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected
+            // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected - done: disabled the run models button if no image is selected
 
             // Initialize Python engine
             if (!PythonEngine.IsInitialized)

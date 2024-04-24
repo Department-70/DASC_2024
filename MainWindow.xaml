@@ -37,7 +37,7 @@
                 <StackPanel Orientation="Vertical" Margin="5" Background="Lightgray">
                     <!-- Image file select/browse button and text box -->
                     <Label Content="Select image:"/>
-                    
+
                     <StackPanel Orientation="Horizontal" Margin="5, -5, 5, 5">
                         <TextBox Text="{Binding SelectedImageFileName, Mode=OneWay}" TextWrapping="NoWrap" MinWidth="200" Width="Auto" Margin="5,5,5,5" IsReadOnly="True" />
                         <Button Content="Browse" Command="{Binding BrowseCommand}" Margin="5,5,5,5" />
@@ -96,7 +96,7 @@
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
-            
+
             <!-- Middle column: Display the selected image -->
             <!--<Image Grid.Column="1" Source="{Binding SelectedImage}" Stretch="Uniform" />-->
             <StackPanel Grid.Column="1" Background="LightGray" Margin="5">
@@ -109,17 +109,162 @@
                 <StackPanel Orientation="Vertical" Margin="5">
                     <Label Content="ResNet50" Margin="10,0,0,0"/>
                     <StackPanel Orientation="Horizontal" Margin="15,0,0,0">
-                        <Image Source="{Binding ResNet50Conv}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
+                                <Grid Margin="0">
+                                    <Rectangle Width="20" Height="100" Fill="LightBlue" Stroke="Black" StrokeThickness="1"
+                                               Margin="-0,0,0,0">
+                                        <Rectangle.RenderTransform>
+                                            <RotateTransform Angle="360" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <TextBlock Text="Initial Conv" VerticalAlignment="Center" HorizontalAlignment="Center"
+                   RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform Angle="270" />
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                </Grid>
 
-                        <Image Source="{Binding ResNet50Layer1}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                            </StackPanel>
 
-                        <Image Source="{Binding ResNet50Layer2}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                            <Image Source="{Binding ResNet50Conv}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
 
-                        <Image Source="{Binding ResNet50Layer3}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <!-- Arrows -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                    Margin="5, -75, 5, 0">
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                        </StackPanel>
 
-                        <Image Source="{Binding ResNet50Layer4}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
+                                <Grid Margin="0">
+                                    <Rectangle Width="20" Height="100" Fill="Orange" Stroke="Black" StrokeThickness="1"
+                            Margin="-0,0,0,0">
+                                        <Rectangle.RenderTransform>
+                                            <RotateTransform Angle="360" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <TextBlock Text="Layer 1" VerticalAlignment="Center" HorizontalAlignment="Center"
+RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform Angle="270" />
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                </Grid>
+                                
+                            </StackPanel>
 
-                        <Image Source="{Binding ResNet50Output}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                            <Image Source="{Binding ResNet50Layer1}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <!-- Arrows -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="5, -75, 5, 0">
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
+                                <Grid Margin="0">
+                                    <Rectangle Width="20" Height="100" Fill="Yellow" Stroke="Black" StrokeThickness="1"
+                            Margin="-0,0,0,0">
+                                        <Rectangle.RenderTransform>
+                                            <RotateTransform Angle="360" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <TextBlock Text="Layer 2" VerticalAlignment="Center" HorizontalAlignment="Center"
+RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform Angle="270" />
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                </Grid>
+
+                            </StackPanel>
+
+                            <Image Source="{Binding ResNet50Layer2}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <!-- Arrows -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="5, -75, 5, 0">
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
+                                <Grid Margin="0">
+                                    <Rectangle Width="20" Height="100" Fill="LightGreen" Stroke="Black" StrokeThickness="1"
+                            Margin="-0,0,0,0">
+                                        <Rectangle.RenderTransform>
+                                            <RotateTransform Angle="360" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <TextBlock Text="Layer 3" VerticalAlignment="Center" HorizontalAlignment="Center"
+RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform Angle="270" />
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                </Grid>
+
+                            </StackPanel>
+
+                            <Image Source="{Binding ResNet50Layer3}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <!-- Arrows -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="5, -75, 5, 0">
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
+                                <Grid Margin="0">
+                                    <Rectangle Width="20" Height="100" Fill="MediumPurple" Stroke="Black" StrokeThickness="1"
+                            Margin="-0,0,0,0">
+                                        <Rectangle.RenderTransform>
+                                            <RotateTransform Angle="360" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <TextBlock Text="Layer 4" VerticalAlignment="Center" HorizontalAlignment="Center"
+RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform Angle="270" />
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                </Grid>
+                                
+                            </StackPanel>
+
+                            <Image Source="{Binding ResNet50Layer4}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Left" />
+                        </StackPanel>
+
+                        <!-- Arrows -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+            Margin="5, -75, 5, 0">
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                            <Polygon Points="0,0 10,5 0,10" Fill="Black" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Final Prediction" Margin="0,-10,0,0"  HorizontalAlignment="Center"/>
+                            
+                            <Image Source="{Binding ResNet50Output}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Center" />
+                        </StackPanel>
                     </StackPanel>
                 </StackPanel>
 
