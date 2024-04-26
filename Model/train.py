@@ -1,79 +1,60 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 17 13:11:12 2023
+import torch
+import torch.nn.functional as F
+from torch.autograd import Variable
 
-@author: Debra Hogue, Timmy Sharp, and Joe Karch
-
-Modified RankNet by Lv et al. to use Tensorflow not Pytorch
-and added additional comments to explain methods
-
-Paper: Simultaneously Localize, Segment and Rank the Camouflaged Objects by Lv et al.
-"""
-
-import tensorflow as tf
-from tensorflow.keras import activations, layers, losses
 import numpy as np
 import os, argparse
+os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 from datetime import datetime
-from Attention.ResNet_models import Generator
+from torch.optim import lr_scheduler
+from model.ResNet_models import Generator
 from data import get_loader
 from utils import adjust_lr, AvgMeter
 from scipy import misc
 import cv2
-from data import test_dataset
-from PIL import ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = True
-import cv2
-import tensorflow.keras.applications.resnet50 as models # instantiates the ResNet50 architecture 
-
+import torchvision.transforms as transforms
 from utils import l2_regularisation
 
+
+
 parser = argparse.ArgumentParser()
-parser.add_argument('--epoch', type=int, default=1, help='epoch number')
+parser.add_argument('--epoch', type=int, default=50, help='epoch number')
 parser.add_argument('--lr_gen', type=float, default=2.5e-5, help='learning rate for generator')
-parser.add_argument('--batchsize', type=int, default=2, help='training batch size')
+parser.add_argument('--batchsize', type=int, default=10, help='training batch size')
 parser.add_argument('--trainsize', type=int, default=480, help='training dataset size')
 parser.add_argument('--decay_rate', type=float, default=0.9, help='decay rate of learning rate')
 parser.add_argument('--decay_epoch', type=int, default=40, help='every n epochs decay learning rate')
 parser.add_argument('--feat_channel', type=int, default=32, help='reduced channel of saliency feat')
 opt = parser.parse_args()
 print('Generator Learning Rate: {}'.format(opt.lr_gen))
-
 # build models
 generator = Generator(channel=opt.feat_channel)
+generator.cuda()
+generator_params = generator.parameters()
+generator_optimizer = torch.optim.Adam(generator_params, opt.lr_gen)
 
 
-# generator_params = generator.parameters()
-# generator_optimizer = tf.optimizers.Adam(generator_params, opt.lr_gen)
+image_root = './dataset/train/Imgs/'
+gt_root = './dataset/train/GT/'
+fix_root = './dataset/train/Fix/'
 
+train_loader = get_loader(image_root, gt_root, fix_root,batchsize=opt.batchsize, trainsize=opt.trainsize)
+total_step = len(train_loader)
 
-image_root = './dataset/COD10K_FixTR/Image/'
-gt_root = './dataset/COD10K_FixTR/GT/'
-fix_root = './dataset/COD10K_FixTR/Fix/'
-
-# train_loader = get_loader(image_root, gt_root, fix_root,batchsize=opt.batchsize, trainsize=opt.trainsize)
-# total_step = len(train_loader)
-
-CE = losses.BinaryCrossentropy(from_logits=True)
-mse_loss = losses.MeanSquaredError()
+CE = torch.nn.BCEWithLogitsLoss()
+mse_loss = torch.nn.MSELoss(size_average=True, reduce=True)
 size_rates = [0.75,1,1.25]  # multi-scale training
 
 def structure_loss(pred, mask):
-    padded = tf.pad(mask,tf.constant([[0,0],[15,15],[15,15],[0,0]]))
-    pooled =tf.nn.avg_pool2d(padded, ksize=31, strides=1, padding="VALID")
-    weit  = 1+5*tf.abs(pooled-mask)
-    weit = tf.squeeze(weit)
-    wbce= tf.nn.sigmoid_cross_entropy_with_logits(mask,pred)
-   
-    wbce= tf.math.reduce_mean(wbce)
-    wbce  = tf.math.reduce_sum((weit*wbce),axis=[1,2]) /tf.reduce_sum(weit,axis=[1,2])
-    mask =tf.squeeze(mask)
-    pred  = tf.math.sigmoid(pred)
-    pred = tf.squeeze(pred)
-    inter = tf.math.reduce_sum((pred*mask)*weit,axis=[1,2])
-    union = tf.math.reduce_sum((pred+mask)*weit, axis=[1,2])
+    weit  = 1+5*torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15)-mask)
+    wbce  = F.binary_cross_entropy_with_logits(pred, mask, reduce='none')
+    wbce  = (weit*wbce).sum(dim=(2,3))/weit.sum(dim=(2,3))
+
+    pred  = torch.sigmoid(pred)
+    inter = ((pred*mask)*weit).sum(dim=(2,3))
+    union = ((pred+mask)*weit).sum(dim=(2,3))
     wiou  = 1-(inter+1)/(union-inter+1)
-    return tf.math.reduce_mean(wbce+wiou)
+    return (wbce+wiou).mean()
 
 def visualize_gt(var_map):
 
@@ -129,78 +110,54 @@ def visualize_fix_gt(var_map):
         save_path = './temp/'
         name = '{:02d}_fix_gt.png'.format(kk)
         cv2.imwrite(save_path + name, pred_edge_kk)
-        
-             
-def loss_function(y_true,y_pred):
-    gts, fixs = tf.unstack(y_true,2,0)
-    gts, _ = tf.split(gts, [1,2], 3)
-    fixs, _ = tf.split(fixs, [1,2], 3)
-    fix_pred, cod_pred1, cod_pred2 = tf.unstack(y_pred,num=3,axis=0)
-    fix_loss = mse_loss(tf.keras.activations.sigmoid(fix_pred),fixs)
-    cod_loss1 = structure_loss(cod_pred1, gts)
-    cod_loss2 = structure_loss(cod_pred2, gts)
-    test= fix_loss + cod_loss1 + cod_loss2
-    print("test")
-    print(fix_loss)
-    print(cod_loss1)
-    print(cod_loss2)
-    return  fix_loss + cod_loss1 + cod_loss2
-    
-    
-def on_epoch_end(epoch, lr):
-    decay = decay_rate ** (epoch // decay_epoch)
-    new_lr = lr * decay
-    print("\nEpoch: {}. Reducing Learning Rate from {} to {}".format(epoch, lr, new_lr))
-    return new_lr
-          
-        
-if __name__ == '__main__':
 
-    logdir="logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
-    
-    op= tf.keras.optimizers.Adam(learning_rate=opt.lr_gen, name='Adam')
-    
-    generator.compile(optimizer=op, loss=loss_function);
-    
-    data = get_loader(image_root, gt_root, fix_root, opt.trainsize, opt.batchsize, size_rates)
-    
-  
-    generator.fit(x=data,
-                  batch_size=opt.batchsize, 
-                  epochs=opt.epoch, 
-                  verbose='auto', 
-                  callbacks=[tensorboard_callback,  
-                             tf.keras.callbacks.LearningRateScheduler(on_epoch_end)])
-     
+for epoch in range(1, (opt.epoch+1)):
+    # scheduler.step()
+    generator.train()
+    loss_record = AvgMeter()
+    print('Generator Learning Rate: {}'.format(generator_optimizer.param_groups[0]['lr']))
+    for i, pack in enumerate(train_loader, start=1):
+        for rate in size_rates:
+            generator_optimizer.zero_grad()
+            images, gts, fixs = pack
+            images = Variable(images)
+            gts = Variable(gts)
+            fixs = Variable(fixs)
+            images = images.cuda()
+            gts = gts.cuda()
+            fixs = fixs.cuda()
+            # multi-scale training samples
+            trainsize = int(round(opt.trainsize * rate / 32) * 32)
+            if rate != 1:
+                images = F.upsample(images, size=(trainsize, trainsize), mode='bilinear', align_corners=True)
+                gts = F.upsample(gts, size=(trainsize, trainsize), mode='bilinear', align_corners=True)
+                fixs = F.upsample(fixs, size=(trainsize, trainsize), mode='bilinear', align_corners=True)
+            fix_pred,cod_pred1,cod_pred2 = generator.forward(images)
+            fix_loss = mse_loss(torch.sigmoid(fix_pred),fixs)
+            cod_loss1 = structure_loss(cod_pred1, gts)
+            cod_loss2 = structure_loss(cod_pred2, gts)
+            final_loss = fix_loss + cod_loss1 + cod_loss2
+            final_loss.backward()
+            generator_optimizer.step()
+
+            visualize_cod1(torch.sigmoid(cod_pred1))
+            visualize_cod2(torch.sigmoid(cod_pred2))
+            visualize_fix(torch.sigmoid(fix_pred))
+            visualize_fix_gt(fixs)
+            visualize_gt(gts)
+
+            if rate == 1:
+                loss_record.update(final_loss.data, opt.batchsize)
+
+        if i % 10 == 0 or i == total_step:
+            print('{} Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}], Gen Loss: {:.4f}'.
+                  format(datetime.now(), epoch, opt.epoch, i, total_step, loss_record.show()))
+
+    adjust_lr(generator_optimizer, opt.lr_gen, epoch, opt.decay_rate, opt.decay_epoch)
+
     save_path = 'models/Resnet/'
 
-    #if not os.path.exists(save_path):
-     #   os.makedirs(save_path)
-    
-    #generator.save_weights(save_path+"model")
-
-    dataset_path = './dataset/test/'
-
-    test_datasets = ['Mine']
-
-    for dataset in test_datasets:
-        save_path = './results/ResNet50/' + dataset + '/'
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-
-    image_root = dataset_path + dataset + '/Imgs/'
-    test_loader = test_dataset(image_root, 480)
-
-    for i in range(test_loader.size):
-        print(i)
-        image, HH, WW, name = test_loader.load_data()
-        ans = generator(image)
-        _,generator_pred, _  = tf.unstack(ans,num=3,axis=0)
-        res = generator_pred
-        res = tf.image.resize(res, size=tf.constant([WW,HH]), method=tf.image.ResizeMethod.BILINEAR)
-        res = tf.math.sigmoid(res).numpy().squeeze()
-        res = 255*(res - res.min()) / (res.max() - res.min() + 1e-8)
-        print(save_path+name)
-        cv2.imwrite(save_path+name, res)
-        print()
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    if epoch % opt.epoch == 0:
+        torch.save(generator.state_dict(), save_path + 'Model' + '_%d' % epoch + '_gen.pth')

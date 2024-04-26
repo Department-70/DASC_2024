@@ -122,13 +122,16 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Model\data.py" />
+    <Content Include="Model\test.py" />
+    <Content Include="Model\train.py" />
+    <Content Include="Model\utils.py" />
     <Content Include="Model\XAI_EfficientDetD7.py" />
     <Content Include="Model\XAI_ResNet50.py" />
     <Resource Include="Assets\image_placeholder.png" />
     <Resource Include="Assets\empty_circle.png" />
     <Resource Include="Assets\filled_circle.png" />
     <Content Include="Model\convert_onnx.py" />
-    <Content Include="Model\data_torch.py" />
     <Content Include="Model\model\backbone.py" />
     <Content Include="Model\model\HolisticAttention.py" />
     <Content Include="Model\model\ResNet.py" />
