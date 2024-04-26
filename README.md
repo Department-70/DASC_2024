@@ -7,6 +7,8 @@
 3. How can the integration of advanced model validation techniques, such as advesarial testing and uncertainty quanitification, within the MURDOC framework enhance the model's robustness and reliability in challenging camouflage scenarios, consequently improving the user trust in the model's performance and decision-making capabilities?
 
 ## Work Completed
+2024-04-18: Updated GUI to display ResNet50 off-ramp XAI & added off-ramps to EfficientDet-D7 in new python script
+
 2024-03-25: Completed the "off-ramps" for XAI output of ResNet50 and RankNet models
 
 2024-04-01: Visual Studio 2022 C# .NET project created
