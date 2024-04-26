@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb 16 11:42:48 2023
-
-Paper: Simultaneously Localize, Segment and Rank the Camouflaged Objects by Lv et al.
+Paper: Toward the Understanding of Camouflaged Object Detection by Lv et al. 2023
 """
 
 import os

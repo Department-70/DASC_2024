@@ -1,3 +1,7 @@
+"""
+Paper: Toward the Understanding of Camouflaged Object Detection by Lv et al. 2023
+"""
+
 import torch.nn as nn
 import torch
 import numpy as np
