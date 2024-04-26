@@ -9,7 +9,7 @@
 ## Work Completed
 2024-04-18: Updated GUI to display ResNet50 off-ramp XAI & added off-ramps to EfficientDet-D7 in new python script
 
-2024-04-17: Python environment for .NET project working
+2024-04-13: Python environment for .NET project working
 
 2024-03-25: Completed the "off-ramps" for XAI output of ResNet50 and RankNet models
 
