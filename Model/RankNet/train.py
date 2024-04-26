@@ -7,7 +7,7 @@ import os, argparse
 os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 from datetime import datetime
 from torch.optim import lr_scheduler
-from model.ResNet_models import Generator
+from RankNet.model.ResNet_models import Generator
 from data import get_loader
 from utils import adjust_lr, AvgMeter
 from scipy import misc

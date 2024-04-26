@@ -5,7 +5,7 @@ import numpy as np
 import pdb, os, argparse
 os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 from scipy import misc
-from model.ResNet_models import Generator
+from RankNet.model.ResNet_models import Generator
 from data import test_dataset
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
