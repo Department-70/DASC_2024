@@ -45,6 +45,10 @@
 
                     <Image Source="{Binding SelectedImage}" Margin="5" Stretch="Uniform" MaxWidth="200" MaxHeight="300" />
 
+                    <!-- TODO: Image Adjustment controls: 
+                                Red, Green, Blue, Brightness, Contrast, and Saturation -->
+                    
+                    
                     <!-- Model controls: Run models to gather prediction and outputs -->
                     <Button Content="Run Models" Command="{Binding RunCommand}" IsEnabled="{Binding IsRunButtonEnabled}" Margin="75,5,75,5" />
                 </StackPanel>
