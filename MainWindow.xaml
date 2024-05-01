@@ -117,7 +117,7 @@
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
                                 <Grid Margin="0">
-                                    <Rectangle Width="20" Height="100" Fill="LightBlue" Stroke="Black" StrokeThickness="1"
+                                    <Rectangle Width="20" Height="80" Fill="LightBlue" Stroke="Black" StrokeThickness="1"
                                                Margin="-0,0,0,0">
                                         <Rectangle.RenderTransform>
                                             <RotateTransform Angle="360" />
@@ -147,7 +147,7 @@
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
                                 <Grid Margin="0">
-                                    <Rectangle Width="20" Height="100" Fill="Orange" Stroke="Black" StrokeThickness="1"
+                                    <Rectangle Width="20" Height="80" Fill="Orange" Stroke="Black" StrokeThickness="1"
                             Margin="-0,0,0,0">
                                         <Rectangle.RenderTransform>
                                             <RotateTransform Angle="360" />
@@ -177,7 +177,7 @@ RenderTransformOrigin="0.5,0.5">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
                                 <Grid Margin="0">
-                                    <Rectangle Width="20" Height="100" Fill="Yellow" Stroke="Black" StrokeThickness="1"
+                                    <Rectangle Width="20" Height="80" Fill="Yellow" Stroke="Black" StrokeThickness="1"
                             Margin="-0,0,0,0">
                                         <Rectangle.RenderTransform>
                                             <RotateTransform Angle="360" />
@@ -207,7 +207,7 @@ RenderTransformOrigin="0.5,0.5">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
                                 <Grid Margin="0">
-                                    <Rectangle Width="20" Height="100" Fill="LightGreen" Stroke="Black" StrokeThickness="1"
+                                    <Rectangle Width="20" Height="80" Fill="LightGreen" Stroke="Black" StrokeThickness="1"
                             Margin="-0,0,0,0">
                                         <Rectangle.RenderTransform>
                                             <RotateTransform Angle="360" />
@@ -237,7 +237,7 @@ RenderTransformOrigin="0.5,0.5">
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5">
                                 <Grid Margin="0">
-                                    <Rectangle Width="20" Height="100" Fill="MediumPurple" Stroke="Black" StrokeThickness="1"
+                                    <Rectangle Width="20" Height="80" Fill="MediumPurple" Stroke="Black" StrokeThickness="1"
                             Margin="-0,0,0,0">
                                         <Rectangle.RenderTransform>
                                             <RotateTransform Angle="360" />
