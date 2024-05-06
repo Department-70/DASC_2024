@@ -159,7 +159,7 @@ def process_image_with_resnet50(image_path):
     # Save feature maps
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
         fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
-        ax.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
+        ax.imshow(feature_map[0, 0].detach().numpy(), cmap='plasma')  # Adjust the channel and color map as needed - magma
         ax.axis('off')
 
         # Save the plot without title
@@ -188,8 +188,6 @@ def process_image_with_resnet50(image_path):
     output_path = f'{prediction_output_location}/{file_name}_prediction.png'
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     plt.close()  # Close the plot
-    
-    return final_image
 
 """
 ===================================================================================================
