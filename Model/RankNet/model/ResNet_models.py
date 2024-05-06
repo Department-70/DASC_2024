@@ -53,7 +53,8 @@ class Generator(nn.Module):
                               align_corners=True)
         cod_pred2 = F.upsample(cod_pred2, size=(x.shape[2], x.shape[3]), mode='bilinear',
                               align_corners=True)
-        return fix_pred, cod_pred1, cod_pred2
+        feature_maps = self.sal_encoder.get_feature_maps()
+        return fix_pred, cod_pred1, cod_pred2, feature_maps
 
 
 """
