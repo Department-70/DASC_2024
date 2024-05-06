@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using Python.Runtime;
+using Python.Runtime; // Ensure this namespace is recognized without errors
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -12,7 +12,9 @@ namespace MURDOC.ViewModel
     {
         #region Private Variables
 
-        private string _selectedImageFileName;
+        private string _selectedImageFileName;  // filename with file type
+
+        private string _selectedImageName;      // filename without file type
 
         private BitmapImage _selectedImage;
 
@@ -65,6 +67,9 @@ namespace MURDOC.ViewModel
                 _selectedImagePath = value;
                 OnPropertyChanged(nameof(SelectedImagePath));
                 UpdateSelectedImageFileName(); // Update SelectedImageFileName when SelectedImagePath changes
+
+                // Enable or disable the Run button based on whether an image is selected
+                IsRunButtonEnabled = !string.IsNullOrEmpty(value);
             }
         }
 
@@ -73,11 +78,24 @@ namespace MURDOC.ViewModel
         /// </summary>
         public string SelectedImageFileName
         {
-            get { return _selectedImageFileName; }
+            get => _selectedImageFileName; 
             private set
             {
                 _selectedImageFileName = value;
                 OnPropertyChanged(nameof(SelectedImageFileName));
+            }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the user selected image file name without the file extension.
+        /// </summary>
+        public string SelectedImageName
+        {
+            get => _selectedImageName;
+            private set
+            {
+                _selectedImageName = value;
+                OnPropertyChanged(nameof(SelectedImageName));
             }
         }
 
@@ -95,6 +113,217 @@ namespace MURDOC.ViewModel
                 // TODO: Reset all Model Traversal Progress circles to empty
 
                 // TODO: Clear all of the Model Traversal Results - except for Input Image
+            }
+        }
+
+        public BitmapImage NoSelectedImage
+        {
+            get { return new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png")); ; }
+            set { }
+        }
+
+        #region ResNet50 Off-Ramp Images
+        /// <summary>
+        /// Setter will set the appropriate off-ramp images dependant on:
+        ///         (1) if the model has run
+        ///         (2) if the off-ramp image exists in the appropriate folder
+        /// </summary>
+        private string _resNet50ConvImagePath;
+        public string ResNet50ConvImagePath
+        {
+            get { return _resNet50ConvImagePath; }
+            set
+            {
+                if (_resNet50ConvImagePath != value)
+                {
+                    _resNet50ConvImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50ConvImagePath));
+
+                    // Load and set the image directly to ResNet50Conv
+                    LoadResNet50ConvImage();
+                }
+            }
+        }
+
+        private BitmapImage _resNet50ConvImage;
+        public BitmapImage ResNet50Conv
+        {
+            get { return _resNet50ConvImage; }
+            set
+            {
+                _resNet50ConvImage = value;
+                OnPropertyChanged(nameof(ResNet50Conv));
+            }
+        }
+
+        private BitmapImage _resNet50Layer1;
+        public BitmapImage ResNet50Layer1
+        {
+            get => _resNet50Layer1;
+            set
+            {
+                if (_resNet50Layer1 != value)
+                {
+                    _resNet50Layer1 = value;
+                    OnPropertyChanged(nameof(ResNet50Layer1));
+                }
+            }
+        }
+
+        private string _resNet50Layer1ImagePath;
+        public string ResNet50Layer1ImagePath
+        {
+            get => _resNet50Layer1ImagePath;
+            set
+            {
+                if (_resNet50Layer1ImagePath != value)
+                {
+                    _resNet50Layer1ImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50Layer1ImagePath));
+
+                    // Load and set the image directly to ResNet50Layer1
+                    LoadResNet50Layer1Image();
+                }
+            }
+        }
+
+        private BitmapImage _resNet50Layer2;
+        public BitmapImage ResNet50Layer2
+        {
+            get => _resNet50Layer2;
+            set
+            {
+                if (_resNet50Layer2 != value)
+                {
+                    _resNet50Layer2 = value;
+                    OnPropertyChanged(nameof(ResNet50Layer2));
+                }
+            }
+        }
+
+        private string _resNet50Layer2ImagePath;
+        public string ResNet50Layer2ImagePath
+        {
+            get => _resNet50Layer2ImagePath;
+            set
+            {
+                if (_resNet50Layer2ImagePath != value)
+                {
+                    _resNet50Layer2ImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50Layer2ImagePath));
+
+                    // Load and set the image directly to ResNet50Layer2
+                    LoadResNet50Layer2Image();
+                }
+            }
+        }
+
+        private BitmapImage _resNet50Layer3;
+        public BitmapImage ResNet50Layer3
+        {
+            get => _resNet50Layer3;
+            set
+            {
+                if (_resNet50Layer3 != value)
+                {
+                    _resNet50Layer3 = value;
+                    OnPropertyChanged(nameof(ResNet50Layer3));
+                }
+            }
+        }
+
+        private string _resNet50Layer3ImagePath;
+        public string ResNet50Layer3ImagePath
+        {
+            get => _resNet50Layer3ImagePath;
+            set
+            {
+                if (_resNet50Layer3ImagePath != value)
+                {
+                    _resNet50Layer3ImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50Layer3ImagePath));
+
+                    // Load and set the image directly to ResNet50Layer3
+                    LoadResNet50Layer3Image();
+                }
+            }
+        }
+
+        private BitmapImage _resNet50Layer4;
+        public BitmapImage ResNet50Layer4
+        {
+            get => _resNet50Layer4;
+            set
+            {
+                if (_resNet50Layer4 != value)
+                {
+                    _resNet50Layer4 = value;
+                    OnPropertyChanged(nameof(ResNet50Layer4));
+                }
+            }
+        }
+
+        private string _resNet50Layer4ImagePath;
+        public string ResNet50Layer4ImagePath
+        {
+            get => _resNet50Layer4ImagePath;
+            set
+            {
+                if (_resNet50Layer4ImagePath != value)
+                {
+                    _resNet50Layer4ImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50Layer4ImagePath));
+
+                    // Load and set the image directly to ResNet50Layer4
+                    LoadResNet50Layer4Image();
+                }
+            }
+        }
+
+        private BitmapImage _resNet50Output;
+        public BitmapImage ResNet50Output
+        {
+            get => _resNet50Output;
+            set
+            {
+                if (_resNet50Output != value)
+                {
+                    _resNet50Output = value;
+                    OnPropertyChanged(nameof(ResNet50Output));
+                }
+            }
+        }
+
+        private string _resNet50OutputImagePath;
+        public string ResNet50OutputImagePath
+        {
+            get => _resNet50OutputImagePath;
+            set
+            {
+                if (_resNet50OutputImagePath != value)
+                {
+                    _resNet50OutputImagePath = value;
+                    OnPropertyChanged(nameof(ResNet50OutputImagePath));
+
+                    // Load and set the image directly to ResNet50Layer4
+                    LoadResNet50OutputImage();
+                }
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Disables/Enables the Run button 
+        /// Relies upon if a user selects an image or not
+        /// </summary>
+        private bool _isRunButtonEnabled;
+        public bool IsRunButtonEnabled
+        {
+            get { return _isRunButtonEnabled; }
+            set
+            {
+                _isRunButtonEnabled = value;
+                OnPropertyChanged(nameof(IsRunButtonEnabled));
             }
         }
 
@@ -195,7 +424,16 @@ namespace MURDOC.ViewModel
         /// </summary>
         public MainWindowViewModel()
         {
+            IsRunButtonEnabled = false; // Disable Run button initially
+
             LoadImage();
+
+            LoadResNet50ConvImage();
+            LoadResNet50Layer1Image();
+            LoadResNet50Layer2Image();
+            LoadResNet50Layer3Image();
+            LoadResNet50Layer4Image();
+            LoadResNet50OutputImage();
 
             _exitCommand = new RelayCommand(ExecuteExitCommand);
 
@@ -259,7 +497,10 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteRunCommand()
         {
-            // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected
+            // Update the RN50MPIcircle to green circle to show model is running
+            RN50MPIcircle = "Assets/filled_circle.png";
+
+            // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected - done: disabled the run models button if no image is selected
 
             // Initialize Python engine
             if (!PythonEngine.IsInitialized)
@@ -276,13 +517,44 @@ namespace MURDOC.ViewModel
                 string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Model", "XAI_ResNet50.py");
                 sys.path.append(os.path.dirname(scriptPath));
 
+                // ResNet50
                 try
                 {
                     // Import your Python script module
-                    dynamic script = Py.Import("XAI_ResNet50");
+                    dynamic script = Py.Import("XAI_ResNet50");                   
 
                     // Call the process_image_with_resnet50 function from your Python script
                     script.process_image_with_resnet50(SelectedImagePath);
+
+                    // TODO: Load the Off-ramp images
+                    string executableDir = AppDomain.CurrentDomain.BaseDirectory;
+                    string folderPath = Path.Combine(executableDir, "resnet50_output", _selectedImageName);
+
+                    // Update the ResNet50ConvImagePath to trigger UI update
+                    string initConvImagePath = Path.Combine(folderPath, _selectedImageName + "_initial_conv_feature_map.png");
+                    ResNet50ConvImagePath = initConvImagePath;
+                    OnPropertyChanged(nameof(ResNet50Conv)); // Trigger UI update for ResNet50Conv
+
+                    string layer1ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer1_block1_feature_map.png");
+                    Console.WriteLine(layer1ImagePath);
+                    ResNet50Layer1ImagePath = layer1ImagePath;
+                    OnPropertyChanged(nameof(ResNet50Layer1));
+
+                    string layer2ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer2_block1_feature_map.png");
+                    ResNet50Layer2ImagePath = layer2ImagePath;
+                    OnPropertyChanged(nameof(ResNet50Layer2));
+
+                    string layer3ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer3_block1_feature_map.png");
+                    ResNet50Layer3ImagePath = layer3ImagePath;
+                    OnPropertyChanged(nameof(ResNet50Layer3));
+
+                    string layer4ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer4_block1_feature_map.png");
+                    ResNet50Layer4ImagePath = layer4ImagePath;
+                    OnPropertyChanged(nameof(ResNet50Layer4));
+
+                    string outputImagePath = Path.Combine(folderPath, _selectedImageName + "_prediction.png");
+                    ResNet50OutputImagePath = outputImagePath;
+                    OnPropertyChanged(nameof(ResNet50Output));
                 }
                 catch (PythonException exception)
                 {
@@ -290,8 +562,8 @@ namespace MURDOC.ViewModel
                     Console.WriteLine("Exception occured: " + exception);
                 }
 
-                // Update the RN50MPIcircle to green circle to show model has ran
-                RN50MPIcircle = "Assets/filled_circle.png";
+                // Update the RN50ResultsCircle to green circle to show the model is done
+                RN50ResultsCircle = "Assets/filled_circle.png";
 
                 // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
 
@@ -308,10 +580,25 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void InitializePythonEngine()
         {
-            string pythonDll = @"C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python39_64\python39.dll";
-            Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
-            // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
-            PythonEngine.Initialize();
+            try
+            {
+                string pythonDll = @"C:\Users\pharm\AppData\Local\Programs\Python\Python39\python39.dll";
+                Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
+
+                // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
+                PythonEngine.Initialize();
+            }
+            catch (TypeInitializationException tiex)
+            {
+                // Log or display the type initialization exception message and inner exception
+                Console.WriteLine("Type Initialization Exception: " + tiex.Message);
+                Console.WriteLine("Inner Exception: " + tiex.InnerException?.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log or display any other exceptions during initialization
+                Console.WriteLine("Error initializing Python engine: " + ex.Message);
+            }
         }
 
         /// <summary>
@@ -331,6 +618,103 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50ConvImage()
+        {
+            if (!string.IsNullOrEmpty(ResNet50ConvImagePath))
+            {
+                ResNet50Conv = new BitmapImage(new Uri(ResNet50ConvImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Conv = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50Layer1Image()
+        {
+            if (!string.IsNullOrEmpty(ResNet50Layer1ImagePath))
+            {
+                Console.WriteLine("Image exists.");
+                ResNet50Layer1 = new BitmapImage(new Uri(ResNet50Layer1ImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Layer1 = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50Layer2Image()
+        {
+            if (!string.IsNullOrEmpty(ResNet50Layer2ImagePath))
+            {
+                ResNet50Layer2 = new BitmapImage(new Uri(ResNet50Layer2ImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Layer2 = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50Layer3Image()
+        {
+            if (!string.IsNullOrEmpty(ResNet50Layer3ImagePath))
+            {
+                ResNet50Layer3 = new BitmapImage(new Uri(ResNet50Layer3ImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Layer3 = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50Layer4Image()
+        {
+            if (!string.IsNullOrEmpty(ResNet50Layer4ImagePath))
+            {
+                ResNet50Layer4 = new BitmapImage(new Uri(ResNet50Layer4ImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Layer4 = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
+        /// Loads an image from the user selected image path or sets a default placeholder image.
+        /// </summary>
+        private void LoadResNet50OutputImage()
+        {
+            if (!string.IsNullOrEmpty(ResNet50OutputImagePath))
+            {
+                ResNet50Output = new BitmapImage(new Uri(ResNet50OutputImagePath));
+            }
+            else
+            {
+                // Set the default placeholder image
+                ResNet50Output = new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png"));
+            }
+        }
+
+        /// <summary>
         /// Updates the GUI to display the user selected image file name
         /// </summary>
         private void UpdateSelectedImageFileName()
@@ -338,6 +722,7 @@ namespace MURDOC.ViewModel
             if (SelectedImagePath != "Assets/image_placeholder.png")
             {
                 SelectedImageFileName = Path.GetFileName(SelectedImagePath);
+                SelectedImageName = Path.GetFileNameWithoutExtension(SelectedImagePath);
             }
         }
 
