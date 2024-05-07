@@ -21,10 +21,10 @@ import matplotlib.pyplot as plt
 
 output_root = './ranknet_output/'
 
-def process_image_with_generator(image_path, generator_model, output_path):
+def process_image_with_generator(image_path, output_path):
     # Load the generator model
     generator = Generator(channel=32)  # Assuming you use the same settings as in the original script
-    generator.load_state_dict(torch.load(generator_model))
+    generator.load_state_dict(torch.load('./models/Resnet/Model_50_gen.pth'))
     generator.cuda()
     generator.eval()
 
