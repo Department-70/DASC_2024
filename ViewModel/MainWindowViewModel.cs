@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ImageProcessor;
+using Microsoft.Win32;
 using Python.Runtime; // Ensure this namespace is recognized without errors
 using System;
 using System.ComponentModel;
@@ -55,6 +56,11 @@ namespace MURDOC.ViewModel
         #endregion
 
         private string _selectedImagePath;
+        private int _sliderBrightness;
+        private int _sliderContrast;
+        private int _sliderSaturation;
+        private MemoryStream _modifiedImageStream;
+        private bool hasUserModifiedImage;
 
         /// <summary>
         /// Getter/Setter for the user selected image path.
@@ -78,7 +84,7 @@ namespace MURDOC.ViewModel
         /// </summary>
         public string SelectedImageFileName
         {
-            get => _selectedImageFileName; 
+            get => _selectedImageFileName;
             private set
             {
                 _selectedImageFileName = value;
@@ -120,6 +126,45 @@ namespace MURDOC.ViewModel
         {
             get { return new BitmapImage(new Uri("pack://application:,,,/MURDOC;component/Assets/image_placeholder.png")); ; }
             set { }
+        }
+
+        public int SliderBrightness
+        {
+            get
+            {
+                return _sliderBrightness;
+            }
+            set
+            {
+                _sliderBrightness = value;
+                UpdateSelectedImage(_sliderBrightness, _sliderContrast, _sliderSaturation);
+            }
+        }
+
+        public int SliderContrast
+        {
+            get
+            {
+                return _sliderContrast;
+            }
+            set
+            {
+                _sliderContrast = value;
+                UpdateSelectedImage(_sliderBrightness, _sliderContrast, _sliderSaturation);
+            }
+        }
+
+        public int SliderSaturation
+        {
+            get
+            {
+                return _sliderSaturation;
+            }
+            set
+            {
+                _sliderSaturation = value;
+                UpdateSelectedImage(_sliderBrightness, _sliderContrast, _sliderSaturation);
+            }
         }
 
         #region ResNet50 Off-Ramp Images
@@ -426,6 +471,10 @@ namespace MURDOC.ViewModel
         {
             IsRunButtonEnabled = false; // Disable Run button initially
 
+            _modifiedImageStream = new MemoryStream();
+            // Create Temporary Folder Location
+            Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp"));
+
             LoadImage();
 
             LoadResNet50ConvImage();
@@ -487,6 +536,7 @@ namespace MURDOC.ViewModel
             openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.gif;*.bmp";
             if (openFileDialog.ShowDialog() == true)
             {
+                hasUserModifiedImage = false;
                 SelectedImagePath = openFileDialog.FileName;
                 LoadImage();
             }
@@ -521,10 +571,14 @@ namespace MURDOC.ViewModel
                 try
                 {
                     // Import your Python script module
-                    dynamic script = Py.Import("XAI_ResNet50");                   
+                    dynamic script = Py.Import("XAI_ResNet50");
+
+                    // Save Temporary Image if user modified
+                    string tempImageLocation = SaveTemporaryImage();
+                    string imageLocation = string.IsNullOrEmpty(tempImageLocation) ? SelectedImagePath : tempImageLocation;
 
                     // Call the process_image_with_resnet50 function from your Python script
-                    script.process_image_with_resnet50(SelectedImagePath);
+                    script.process_image_with_resnet50(imageLocation);
 
                     // TODO: Load the Off-ramp images
                     string executableDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -582,7 +636,7 @@ namespace MURDOC.ViewModel
         {
             try
             {
-                string pythonDll = @"C:\Users\pharm\AppData\Local\Programs\Python\Python39\python39.dll";
+                string pythonDll = Environment.GetEnvironmentVariable("PythonDLL", EnvironmentVariableTarget.User);
                 Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
 
                 // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
@@ -602,11 +656,75 @@ namespace MURDOC.ViewModel
         }
 
         /// <summary>
+        /// Updates the selected image with user defined brightnesss, contrast, and saturation values
+        /// </summary>
+        /// <param name="brightness">User Defined Brightness</param>
+        /// <param name="contrast">User Defined Contrast</param>
+        /// <param name="saturation">User Defined Saturation</param>
+        private void UpdateSelectedImage(int brightness, int contrast, int saturation)
+        {
+            if (!string.IsNullOrEmpty(SelectedImagePath))
+            {
+                byte[] imageBytes = File.ReadAllBytes(SelectedImagePath);
+                using (MemoryStream inStream = new MemoryStream(imageBytes))
+                {
+                    using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
+                    {
+                        hasUserModifiedImage = true;
+                        imageFactory.Load(inStream);
+                        imageFactory.Brightness(brightness);
+                        imageFactory.Contrast(contrast);
+                        imageFactory.Saturation(saturation);
+                        imageFactory.Save(_modifiedImageStream);
+                        LoadImage();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Saves the temporary image to a temp folder in JPG format
+        /// </summary>
+        /// <returns>String of location saved</returns>
+        private string SaveTemporaryImage()
+        {
+            string tempPath = string.Empty;
+            if (hasUserModifiedImage)
+            {
+                byte[] imageBytes = File.ReadAllBytes(SelectedImagePath);
+                using (MemoryStream inStream = new MemoryStream(imageBytes))
+                {
+                    using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
+                    {
+                        tempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp", "Temp.jpg");
+                        imageFactory.Load(inStream);
+                        imageFactory.Brightness(_sliderBrightness);
+                        imageFactory.Contrast(_sliderContrast);
+                        imageFactory.Saturation(_sliderSaturation);
+                        // Delete old temp file if exists since it won't overwrite
+                        File.Delete(tempPath);
+                        imageFactory.Save(tempPath);
+                    }
+                }
+            }
+            return tempPath;
+        }
+
+        /// <summary>
         /// Loads an image from the user selected image path or sets a default placeholder image.
         /// </summary>
         private void LoadImage()
         {
-            if (!string.IsNullOrEmpty(SelectedImagePath))
+            if (hasUserModifiedImage)
+            {
+                BitmapImage tempModifiedImage = new BitmapImage();
+                tempModifiedImage.BeginInit();
+                tempModifiedImage.CacheOption = BitmapCacheOption.OnLoad;
+                tempModifiedImage.StreamSource = _modifiedImageStream;
+                tempModifiedImage.EndInit();
+                SelectedImage = tempModifiedImage;
+            }
+            else if (!string.IsNullOrEmpty(SelectedImagePath))
             {
                 SelectedImage = new BitmapImage(new Uri(SelectedImagePath));
             }
