@@ -17,6 +17,9 @@ from data import test_dataset
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import cv2
+import matplotlib.pyplot as plt
+
+output_root = './ranknet_output/'
 
 def process_image_with_generator(image_path, generator_model, output_path):
     # Load the generator model
@@ -26,18 +29,30 @@ def process_image_with_generator(image_path, generator_model, output_path):
     generator.eval()
 
     # Load the image
+    file_name = os.path.splitext(os.path.basename(image_path))[0]
     image = cv2.imread(image_path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = cv2.resize(image, (480, 480))  # Assuming you use the same test size as in the original script
     image_tensor = torch.from_numpy(image.transpose((2, 0, 1))).float().unsqueeze(0).cuda()
 
     # Generate predictions with the generator
-    _, _, generator_pred = generator.forward(image_tensor)
+    _, _, generator_pred, feature_maps = generator.forward(image_tensor)
     res = generator_pred
     res = F.upsample(res, size=[480, 480], mode='bilinear', align_corners=False)
     res = res.sigmoid().data.cpu().numpy().squeeze()
     res = 255 * (res - res.min()) / (res.max() - res.min() + 1e-8)
 
+    # Save feature maps
+    for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
+        fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
+        ax.imshow(feature_map[0, 0].detach().numpy(), cmap='plasma')  # Adjust the channel and color map as needed - magma
+        ax.axis('off')
+
+        # Save the plot without title
+        output_path = f'{output_path}/{file_name}_{key}_feature_map.png'
+        fig.savefig(output_path, bbox_inches='tight', pad_inches=0)
+        plt.close(fig)  # Close the figure to free up memory
+        
     # Save the generated image
     cv2.imwrite(output_path, res)
 
