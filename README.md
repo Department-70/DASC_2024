@@ -3,11 +3,13 @@
 
 ## Research Questions
 1. How does incorporating off-ramps for eXplainable AI (XAI) output enhance the trustworthiness of the MURDOC application by providing transparent and reliable explanations of the decision-making process?
-2. To what extent does the incorporation of user-driven verification mechanisms within the MURDOC visualization tool improve the trustworthiness of the model's predictions in camouflage detection, allowing users to actively participate in decision-making processes and validate model outputs based on their knowledge and experience? 
+2. To what extent does the integration of user-controllable image enhancement functionalities, such as brightness, contrast, and saturation adjustments, within the MURDOC visualization tool contribute to enhancing trust, usability, and understanding in camouflage detection?
 3. How can the integration of advanced model validation techniques, such as advesarial testing and uncertainty quanitification, within the MURDOC framework enhance the model's robustness and reliability in challenging camouflage scenarios, consequently improving the user trust in the model's performance and decision-making capabilities?
 
 ## Work Completed
-2024-04-18: Updated GUI to display ResNet50 off-ramp XAI & added off-ramps to EfficientDet-D7 in new python script
+2024-05-01: Image adjustment user controls (brightness/contrast/saturation); Added off-ramps to RankNet; Adjusted GUI layout
+
+2024-04-18: Updated GUI to display ResNet50 backbone off-ramp XAI & added off-ramps to EfficientDet-D7 in new python script
 
 2024-04-13: Python environment for .NET project working
 
@@ -16,10 +18,9 @@
 2024-04-01: Visual Studio 2022 C# .NET project created
 
 ## TODOS
-1. Add "off-ramps" for XAI output of EfficientDet-D7 model
+1. Get LIME XAI working for intermediate final predictions for ResNet50 backbone, RankNet, and EfficientDet-D7
 2. Complete design utilizing Gestalt principles and xaml coding of MURDOC GUI 
-3. Wire up C# front-end with Python back-end (utilize pythonnet lib)
-4. Incorporate cybersecurity elements to project
+3. Incorporate cybersecurity elements to project
 
 ### Abstract
 This paper introduces the Mixed Understanding and Recognition for Detection of Camouflage (MURDOC) project, which aims to enhance explainability in computer vision models, specifically focusing on camouflage detection. The project seeks to develop tools and methodologies to clarify decision-making processes and improve user understanding of camouflaged object detection and segmentation (CODS). Examining the critical necessity for explainability in computer vision, particularly in comprehending the decision-making procedures of machine learning (ML) and artificial intelligence (AI) models, forms the foundation of this research.
