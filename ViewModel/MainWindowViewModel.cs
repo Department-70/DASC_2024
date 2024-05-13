@@ -696,7 +696,7 @@ namespace MURDOC.ViewModel
                 {
                     using (ImageFactory imageFactory = new ImageFactory(preserveExifData: true))
                     {
-                        tempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp", "Temp.jpg");
+                        tempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp", SelectedImageName + ".jpg");
                         imageFactory.Load(inStream);
                         imageFactory.Brightness(_sliderBrightness);
                         imageFactory.Contrast(_sliderContrast);
