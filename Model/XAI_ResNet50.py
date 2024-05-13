@@ -18,6 +18,9 @@ from torchvision import models, transforms
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+from lime import lime_image
+from skimage.segmentation import mark_boundaries
+
 # Folder containing images
 gt_root = './GT/'
 image_root = './images/'
@@ -91,6 +94,54 @@ class XAIResNet50(torch.nn.Module):
         output = self.resnet50.fc(features)
 
         return output
+    
+    def apply_lime_explanation(self, feature_map, key, predictions):
+            # Initialize LIME explainer for image classification
+            explainer = lime_image.LimeImageExplainer()
+    
+            # Convert feature map tensor to numpy array
+            feature_map_numpy = feature_map.detach().numpy()
+    
+            # Convert predictions (assuming self.predictions is a PyTorch tensor) to numpy array
+            predictions_numpy = predictions.detach().numpy()
+    
+            # Create a synthetic RGB image by repeating the feature map across channels
+            synthetic_image = np.repeat(np.squeeze(feature_map_numpy), 3, axis=0)  # Squeeze to remove singleton dimensions
+    
+            # Define a classifier function for LIME using the model's predictions
+            def classifier_fn(images):
+                # Assuming images is a numpy array
+                # Convert images to PyTorch tensor if needed
+                images_tensor = torch.from_numpy(images).float()
+                # Forward pass through the model to get predictions
+                with torch.no_grad():
+                    outputs = self.model(images_tensor)
+                return outputs.numpy()  # Convert predictions back to numpy array
+    
+            # Explain predictions for the synthetic RGB image
+            explanation = explainer.explain_instance(
+                synthetic_image,
+                classifier_fn,  # Pass the classifier function instead of predictions
+                top_labels=1,
+                hide_color=0,
+                num_samples=1000
+            )
+    
+            # Display or save the LIME explanation
+            lime_heatmap = mark_boundaries(
+                np.array(explanation.segments),
+                explanation.local_exp[explanation.top_labels[0]]
+            )
+            plt.imshow(lime_heatmap)
+            plt.title(f"{key}_LIME_Explanation")
+            plt.axis('off')
+    
+            # Save the plot
+            output_path = f'{output_root}/{file_name}_{key}_LIME_Explanation.png'
+            plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
+            plt.close()
+    
+            return explanation
     
     def get_feature_maps(self):
         return self.feature_maps
@@ -169,27 +220,30 @@ def process_image_with_resnet50(image_path):
 
     # Get predictions
     predictions = predict_function(np.expand_dims(original_image_pil, 0), xai_resnet50_model)
-    heatmap = predictions[0]
+    # heatmap = predictions[0]
+        
+    # Apply LIME explanation using feature maps and predictions
+    lime_explanation = xai_resnet50_model.apply_lime_explanation(features[0,0], prediction_output_location)
     
     # Resize and normalize heatmap
-    heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
-    heatmap_normalized = (heatmap_resized - np.min(heatmap_resized)) / (np.max(heatmap_resized) - np.min(heatmap_resized))
+    #heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
+    #heatmap_normalized = (heatmap_resized - np.min(heatmap_resized)) / (np.max(heatmap_resized) - np.min(heatmap_resized))
     
     # Convert heatmap to RGB image
-    heatmap_rgb = plt.cm.viridis(heatmap_normalized)[:, :, :3]
+    #heatmap_rgb = plt.cm.viridis(heatmap_normalized)[:, :, :3]
     
     # Overlay heatmap on original image
-    overlay_image = (heatmap_rgb * 255).astype(np.uint8)
-    final_image = cv2.addWeighted(original_image, 0.4, overlay_image, 0.6, 0)
+    #overlay_image = (heatmap_rgb * 255).astype(np.uint8)
+    #final_image = cv2.addWeighted(original_image, 0.4, overlay_image, 0.6, 0)
     
     # Save the final prediction image
-    plt.imshow(final_image)
-    plt.axis('off')
-    output_path = f'{prediction_output_location}/{file_name}_prediction.png'
-    plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
-    plt.close()  # Close the plot
+    #plt.imshow(final_image)
+    #plt.axis('off')
+    #output_path = f'{prediction_output_location}/{file_name}_prediction.png'
+    #plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
+    #plt.close()  # Close the plot
     
-    return final_image
+    return lime_explanation #final_image
 
 """
 ===================================================================================================
