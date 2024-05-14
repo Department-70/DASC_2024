@@ -217,13 +217,13 @@ def process_image_with_resnet50(image_path):
         output_path = f'{prediction_output_location}/{file_name}_{key}_feature_map.png'
         fig.savefig(output_path, bbox_inches='tight', pad_inches=0)
         plt.close(fig)  # Close the figure to free up memory
+        
+        # Apply LIME explanation using feature maps and predictions
+        #lime_explanation = xai_resnet50_model.apply_lime_explanation(feature_map[0,0], key, prediction_output_location)
 
     # Get predictions
-    predictions = predict_function(np.expand_dims(original_image_pil, 0), xai_resnet50_model)
-    # heatmap = predictions[0]
-        
-    # Apply LIME explanation using feature maps and predictions
-    lime_explanation = xai_resnet50_model.apply_lime_explanation(features[0,0], prediction_output_location)
+    #predict1ions = predict_function(np.expand_dims(original_image_pil, 0), xai_resnet50_model)
+    # heatmap = predictions[0]   
     
     # Resize and normalize heatmap
     #heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
@@ -243,7 +243,7 @@ def process_image_with_resnet50(image_path):
     #plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     #plt.close()  # Close the plot
     
-    return lime_explanation #final_image
+    #return lime_explanation #final_image
 
 """
 ===================================================================================================
