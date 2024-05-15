@@ -65,10 +65,7 @@ class XAIResNet50(torch.nn.Module):
         features = F.adaptive_avg_pool2d(features, (1, 1))
         features = torch.flatten(features, 1)
         self.predictions = self.resnet50.fc(features)
-    
-        # Print feature map keys and the size of the dictionary for debugging
-        print("Feature maps captured during forward pass:", self.feature_maps.keys())
-        print("Size of the feature_maps dictionary:", len(self.feature_maps))      
+        self.feature_maps['prediction'] = self.predictions.clone().detach()   
     
     def apply_lime_explanation(self, feature_map, key, predictions):
             # Initialize LIME explainer for image classification
