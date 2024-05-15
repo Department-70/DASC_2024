@@ -589,20 +589,20 @@ namespace MURDOC.ViewModel
                     ResNet50ConvImagePath = initConvImagePath;
                     OnPropertyChanged(nameof(ResNet50Conv)); // Trigger UI update for ResNet50Conv
 
-                    string layer1ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer1_block1_feature_map.png");
+                    string layer1ImagePath = Path.Combine(folderPath, _selectedImageName + "_stage1_feature_map.png");
                     Console.WriteLine(layer1ImagePath);
                     ResNet50Layer1ImagePath = layer1ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer1));
 
-                    string layer2ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer2_block1_feature_map.png");
+                    string layer2ImagePath = Path.Combine(folderPath, _selectedImageName + "_stage2_feature_map.png");
                     ResNet50Layer2ImagePath = layer2ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer2));
 
-                    string layer3ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer3_block1_feature_map.png");
+                    string layer3ImagePath = Path.Combine(folderPath, _selectedImageName + "_stage3_feature_map.png");
                     ResNet50Layer3ImagePath = layer3ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer3));
 
-                    string layer4ImagePath = Path.Combine(folderPath, _selectedImageName + "_layer4_block1_feature_map.png");
+                    string layer4ImagePath = Path.Combine(folderPath, _selectedImageName + "_stage4_feature_map.png");
                     ResNet50Layer4ImagePath = layer4ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer4));
 
