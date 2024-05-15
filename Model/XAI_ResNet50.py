@@ -64,18 +64,23 @@ class XAIResNet50(torch.nn.Module):
         # Global average pooling and final fully connected layer
         features = F.adaptive_avg_pool2d(features, (1, 1))
         features = torch.flatten(features, 1)
+        
+        # Prediction
         self.predictions = self.resnet50.fc(features)
         self.feature_maps['prediction'] = self.predictions.clone().detach()   
+        
+        # LIME XAI of Prediction
+        
     
-    def apply_lime_explanation(self, feature_map, key, predictions):
+    def apply_lime_explanation(self):
             # Initialize LIME explainer for image classification
             explainer = lime_image.LimeImageExplainer()
     
             # Convert feature map tensor to numpy array
-            feature_map_numpy = feature_map.detach().numpy()
+            feature_map_numpy = self.feature_map.detach().numpy()
     
             # Convert predictions (assuming self.predictions is a PyTorch tensor) to numpy array
-            predictions_numpy = predictions.detach().numpy()
+            predictions_numpy = self.predictions.detach().numpy()
     
             # Create a synthetic RGB image by repeating the feature map across channels
             synthetic_image = np.repeat(np.squeeze(feature_map_numpy), 3, axis=0)  # Squeeze to remove singleton dimensions
@@ -104,15 +109,8 @@ class XAIResNet50(torch.nn.Module):
                 np.array(explanation.segments),
                 explanation.local_exp[explanation.top_labels[0]]
             )
-            plt.imshow(lime_heatmap)
-            plt.axis('off')
-    
-            # Save the plot
-            output_path = f'{output_root}/{file_name}_{key}_LIME_prediction.png'
-            plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
-            plt.close()
-    
-            return explanation
+   
+            self.feature_maps['LIME'] =  lime_heatmap
     
     def get_feature_maps(self):
         return self.feature_maps
@@ -181,23 +179,7 @@ def process_image_with_resnet50(image_path):
     # Save feature maps
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
         plt.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  
-        plt.title(f"Feature Map - {key}")
         plt.axis('off')
         output_path = f'{prediction_output_location}/{file_name}_{key}_feature_map.png'
         plt.savefig(output_path)
         plt.close()  # Close the plot
-
-    # Get predictions
-    #predictions = predict_function(np.expand_dims(original_image_pil, 0))
-    #heatmap = predictions[0]
-    
-    # Resize and normalize heatmap
-    #heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
-    #heatmap_normalized = (heatmap_resized - np.min(heatmap_resized)) / (np.max(heatmap_resized) - np.min(heatmap_resized))
-    
-    # Convert heatmap to RGB image
-    #heatmap_rgb = plt.cm.viridis(heatmap_normalized)[:, :, :3]
-    
-    # Overlay heatmap on original image
-    #overlay_image = (heatmap_rgb * 255).astype(np.uint8)
-    #final_image = cv2.addWeighted(original_image, 0.4, overlay_image, 0.6, 0)
