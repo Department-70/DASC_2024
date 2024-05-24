@@ -235,99 +235,17 @@ def process_image_with_resnet50(image_path):
 if __name__ == "__main__":
     # Counter
     counter = 1
-    
-    # Create an instance of the XAIResNet50 model
-    xai_resnet50_model = XAIResNet50()
-            
-    """
-    ===================================================================================================
-        Loop to iterate through the dataset
-    ===================================================================================================
-    """
-    for files in os.scandir(image_root):
-        print("Counter = " + str(counter) + '.')
-    
-        # Filename
-        file_name = os.path.splitext(files.name)[0]
-        print("File Name:" + file_name)
-        
-        # Load an RGB image using PIL
-        original_image_pil = Image.open(image_root + file_name + '.jpg').convert('RGBA')
-        original_image = np.array(original_image_pil)
-        
-        # Load the GT image using PIL
-        gt_image_pil = Image.open(gt_root + file_name + '.png')
-        gt_image = np.array(gt_image_pil)
-                
-        # Ensure the image is in RGB format
-        original_image = original_image[:, :, :3]  # Discard the alpha channel if it exists
-        
-        prediction_output_location = os.path.join(output_root, file_name)
-        if os.path.exists(prediction_output_location) and os.listdir(prediction_output_location):
-            print(f'Skipping {file_name} as prediction output already exists.')
-            counter += 1
-            continue
-        
-        print(f'Prediction Output Location: {prediction_output_location}')
-        
-        # Create the folder dynamically
-        os.makedirs(prediction_output_location, exist_ok=True)
 
-        # Forward pass with ResNet50
-        features = xai_resnet50_model(torch.unsqueeze(transform(original_image_pil), 0),
-                                      save_folder=prediction_output_location,
-                                      file_name=file_name)
-        
-        # Get the feature maps
-        feature_maps = xai_resnet50_model.get_feature_maps()
-        
-        # Visualize or save the feature maps as needed
-        # for key, feature_map in feature_maps.items():
-        for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
-            fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
-            ax.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
-            ax.axis('off')
-
-            # Save the plot without title
-            output_path = f'{prediction_output_location}/{file_name}_{key}_feature_map.png'
-            fig.savefig(output_path, bbox_inches='tight', pad_inches=0)
-            plt.close(fig)  # Close the figure to free up memory
-                                
-        # Use the predict_function to get predictions
-        predictions = predict_function(np.expand_dims(original_image_pil, 0))
-        
-        # Assuming predictions is a NumPy array with shape (1, 1000)
-        heatmap = predictions[0]
-        
-        # Resize the heatmap to match the size of the original image
-        heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
-        
-        # Normalize the heatmap values to be between 0 and 1
-        heatmap_normalized = (heatmap_resized - np.min(heatmap_resized)) / (np.max(heatmap_resized) - np.min(heatmap_resized))
-        
-        # Convert the heatmap to an RGB image
-        heatmap_rgb = plt.cm.viridis(heatmap_normalized)[:, :, :3]
-        
-        # Overlay the heatmap on the original image
-        overlay_image = (heatmap_rgb * 255).astype(np.uint8)
-        final_image = cv2.addWeighted(original_image, 0.4, overlay_image, 0.6, 0)
-        
-        # Display the final image
-        plt.imshow(final_image)
-        plt.title("Prediction Overlay on Original Image")
-        plt.axis('off')
-        
-        # Save the plot
-        output_path = f'{prediction_output_location}/{file_name}_prediction.png'
-        plt.savefig(output_path)
-        
-        # Show the plot
-        # plt.show()
-        
-        # Close the Plot to clear up space
-        plt.close()
-                
+    # Folder containing images
+    image_folder_path = './images/'
+    
+    # List all images in the folder
+    image_files = [os.path.join(image_folder_path, file) for file in os.listdir(image_folder_path) if file.endswith(('jpg', 'jpeg', 'png'))]
+    
+    # Loop through each image in the folder
+    for image_file in image_files:
+        process_image_with_resnet50(image_file)
         counter += 1
         
-        if counter > 3040:
+        if counter >= 2:
             break
