@@ -149,7 +149,7 @@ def superimpose_gradcam(img_path, gradcam, output_location, file_name):
     plt.axis('off')
     
     # Save the plot without title
-    output_path = f'{output_location}/{file_name}_prediction_feature_map.png'
+    output_path = f'{output_location}/{file_name}_prediction.png'
     plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
     plt.close()  # Close the figure to free up memory
     
