@@ -31,70 +31,124 @@ output_root = './resnet50_output/'
 class XAIResNet50(torch.nn.Module):
     def __init__(self):
         super(XAIResNet50, self).__init__()
-        # Load pre-trained ResNet50 model with 3 channels
-        self.resnet50 = models.resnet50(pretrained=True)
         
-        # Modify the first layer to accept input with 4 channels
-        # Adjust the weight accordingly by adding an extra channel
-        self.resnet50.conv1 = nn.Conv2d(4, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        # Load pre-trained ResNet50 model
+        self.resnet50 = models.resnet50(pretrained=True)   
         
-        # Initialize as a dictionary object
+        # Initialize feature maps (off-ramps output collection)
         self.feature_maps = {}
+        
+        # Initialize prediction object
+        self.predictions = None
 
     def forward(self, x, save_folder=None, file_name=None):
-        # Original forward pass of ResNet50
+        # Initial layers
         features = self.resnet50.bn1(self.resnet50.relu(self.resnet50.conv1(x)))
-        
-        # Save the initial conv layer features
-        # 1st "Off-ramp"
-        self.feature_maps['initial_conv'] = features.clone().detach()
-        
         features = self.resnet50.maxpool(features)
+        self.feature_maps['initial_conv'] = features.clone().detach()
 
+        # Layer 1
         features = self.resnet50.layer1(features)
+        self.feature_maps['stage1'] = features.clone().detach()
         
-        # Save images after each block in layer1
-        # 2nd "Off-ramp"
-        for i in range(3):
-            block_name = f'layer1_block{i+1}'
-            self.feature_maps[block_name] = features.clone().detach()
-
+        # Layer 2
         features = self.resnet50.layer2(features)
+        self.feature_maps['stage2'] = features.clone().detach()
         
-        # Save images after each block in layer2
-        # 3rd "Off-ramp"
-        for i in range(4):
-            block_name = f'layer2_block{i+1}'
-            self.feature_maps[block_name] = features.clone().detach()
-
+        # Layer 3
         features = self.resnet50.layer3(features)
+        self.feature_maps['stage3'] = features.clone().detach()
         
-        # Save images after each block in layer3
-        # 4th "Off-ramp"
-        for i in range(6):
-            block_name = f'layer3_block{i+1}'
-            self.feature_maps[block_name] = features.clone().detach()
-
+        # Layer 4
         features = self.resnet50.layer4(features)
+        self.feature_maps['stage4'] = features.clone().detach()
         
-        # Save images after each block in layer4
-        # 5th "Off-ramp"
-        for i in range(3):
-            block_name = f'layer4_block{i+1}'
-            self.feature_maps[block_name] = features.clone().detach()
-
-        # Global average pooling layer
+        # Global average pooling and final fully connected layer
         features = F.adaptive_avg_pool2d(features, (1, 1))
-        
-        # Fully connected layer (Output layer)
         features = torch.flatten(features, 1)
-        output = self.resnet50.fc(features)
-
-        return output
+        self.predictions = self.resnet50.fc(features)
     
     def get_feature_maps(self):
         return self.feature_maps
 
+"""
+===================================================================================================
+    Define a function to preprocess the image
+===================================================================================================
+"""
+def preprocess_image(image_path):
+    preprocess = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    image = Image.open(image_path).convert('RGB')
+    image_tensor = preprocess(image).unsqueeze(0)  # Add batch dimension
+    return image_tensor
+
+"""
+===================================================================================================
+    Hook for the gradients of the target layer
+===================================================================================================
+"""
+class SaveFeatures:
+    def __init__(self, module):
+        self.hook = module.register_forward_hook(self.hook_fn)
+        self.features = None
+        self.gradients = None
+
+    def hook_fn(self, module, input, output):
+        self.features = output
+        self.hook_grad = output.register_hook(self.hook_grad_fn)
+
+    def hook_grad_fn(self, grad):
+        self.gradients = grad
+
+    def close(self):
+        self.hook.remove()
+
+"""
+===================================================================================================
+    Generate Grad_CAM heatmap
+===================================================================================================
+"""
+def generate_gradcam(model, img_tensor, target_layer, target_class=None):
+    sf = SaveFeatures(target_layer)
+    output = model(img_tensor)
+    
+    # Access the predictions directly from the model
+    output = model.predictions
+
+    if target_class is None:
+        target_class = output.argmax().item()
+
+    model.zero_grad()
+    class_loss = F.cross_entropy(output, torch.tensor([target_class]))
+    class_loss.backward()
+
+    gradients = sf.gradients.data.numpy()[0]
+    activations = sf.features.data.numpy()[0]
+    weights = np.mean(gradients, axis=(1, 2))
+    gradcam = np.zeros(activations.shape[1:], dtype=np.float32)
+
+    for i, w in enumerate(weights):
+        gradcam += w * activations[i, :, :]
+
+    gradcam = np.maximum(gradcam, 0)
+    gradcam = gradcam / gradcam.max()
+    gradcam = np.uint8(gradcam * 255)
+    gradcam = Image.fromarray(gradcam).resize((img_tensor.size(2), img_tensor.size(3)), Image.LANCZOS)
+    return gradcam
+
+# Superimpose Grad-CAM heatmap on original image
+def superimpose_gradcam(img_path, gradcam):
+    img = Image.open(img_path).convert('RGB')
+    plt.imshow(img)
+    plt.imshow(gradcam, cmap='jet', alpha=0.5)
+    plt.axis('off')
+    plt.show()
+    
 """
 ===================================================================================================
     Image Preprocessing Helper Functions
@@ -135,59 +189,43 @@ def predict_function(images, xai_resnet50_model):
 def to_pil_image(tensor):
     return transforms.ToPILImage()(tensor)
 
+"""
+===================================================================================================
+    Callable Function for C# front-end
+===================================================================================================
+"""
 def process_image_with_resnet50(image_path):
     # Create an instance of the XAIResNet50 model
     xai_resnet50_model = XAIResNet50()
     
     # Load the image
     file_name = os.path.splitext(os.path.basename(image_path))[0]
-    original_image_pil = Image.open(image_path).convert('RGBA')
-    original_image = np.array(original_image_pil)
-    original_image = original_image[:, :, :3]  # Ensure RGB format
+    input_tensor = preprocess_image(image_path)
+    xai_resnet50_model(input_tensor)
+    xai_resnet50_model.eval()
+    target_layer = xai_resnet50_model.resnet50.layer4[2].conv3  # target the final convolutional layer
     
-    prediction_output_location = os.path.join(output_root, file_name)
-    os.makedirs(prediction_output_location, exist_ok=True)
-
-    # Forward pass with ResNet50
-    features = xai_resnet50_model(torch.unsqueeze(transform(original_image_pil), 0),
-                                  save_folder=prediction_output_location,
-                                  file_name=file_name)
+    gradcam = generate_gradcam(model, input_tensor, target_layer)
+    superimpose_gradcam(image_path, gradcam)
     
     # Get the feature maps
     feature_maps = xai_resnet50_model.get_feature_maps()
     
-    # Save feature maps
+    prediction_output_location = os.path.join(output_root, file_name)
+    if os.path.exists(prediction_output_location) and os.listdir(prediction_output_location):
+        print(f'Skipping {file_name} as prediction output already exists.')
+    
+    print(f'Prediction Output Location: {prediction_output_location}')
+
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
         fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
-        ax.imshow(feature_map[0, 0].detach().numpy(), cmap='plasma')  # Adjust the channel and color map as needed - magma
+        ax.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
         ax.axis('off')
-
+    
         # Save the plot without title
         output_path = f'{prediction_output_location}/{file_name}_{key}_feature_map.png'
         fig.savefig(output_path, bbox_inches='tight', pad_inches=0)
         plt.close(fig)  # Close the figure to free up memory
-
-    # Get predictions
-    predictions = predict_function(np.expand_dims(original_image_pil, 0), xai_resnet50_model)
-    heatmap = predictions[0]
-    
-    # Resize and normalize heatmap
-    heatmap_resized = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
-    heatmap_normalized = (heatmap_resized - np.min(heatmap_resized)) / (np.max(heatmap_resized) - np.min(heatmap_resized))
-    
-    # Convert heatmap to RGB image
-    heatmap_rgb = plt.cm.viridis(heatmap_normalized)[:, :, :3]
-    
-    # Overlay heatmap on original image
-    overlay_image = (heatmap_rgb * 255).astype(np.uint8)
-    final_image = cv2.addWeighted(original_image, 0.4, overlay_image, 0.6, 0)
-    
-    # Save the final prediction image
-    plt.imshow(final_image)
-    plt.axis('off')
-    output_path = f'{prediction_output_location}/{file_name}_prediction.png'
-    plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
-    plt.close()  # Close the plot
 
 """
 ===================================================================================================
