@@ -142,12 +142,16 @@ def generate_gradcam(model, img_tensor, target_layer, target_class=None):
     return gradcam
 
 # Superimpose Grad-CAM heatmap on original image
-def superimpose_gradcam(img_path, gradcam):
+def superimpose_gradcam(img_path, gradcam, output_location, file_name):
     img = Image.open(img_path).convert('RGB')
     plt.imshow(img)
     plt.imshow(gradcam, cmap='jet', alpha=0.5)
     plt.axis('off')
-    plt.show()
+    
+    # Save the plot without title
+    output_path = f'{output_location}/{file_name}_prediction_feature_map.png'
+    plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
+    plt.close()  # Close the figure to free up memory
     
 """
 ===================================================================================================
@@ -164,16 +168,6 @@ def transform(image):
         transforms.Normalize(mean=[0.485, 0.456, 0.406, 0.0], std=[0.229, 0.224, 0.225, 1.0]),
     ])
     return preprocess(image)
-
-# Define a function to predict using the ResNet50 model
-def predict_function(images):
-    # Make a copy of the NumPy array
-    images_copy = np.copy(images)
-
-    # Images should be in the shape (num_samples, height, width, num_channels)
-    images_tensor = torch.Tensor(images_copy).permute(0, 3, 1, 2)
-    outputs = xai_resnet50_model(images_tensor)
-    return outputs.detach().numpy()
 
 # Define a function to predict using the ResNet50 model
 def predict_function(images, xai_resnet50_model):
@@ -204,10 +198,7 @@ def process_image_with_resnet50(image_path):
     xai_resnet50_model(input_tensor)
     xai_resnet50_model.eval()
     target_layer = xai_resnet50_model.resnet50.layer4[2].conv3  # target the final convolutional layer
-    
-    gradcam = generate_gradcam(xai_resnet50_model, input_tensor, target_layer)
-    superimpose_gradcam(image_path, gradcam)
-    
+            
     # Get the feature maps
     feature_maps = xai_resnet50_model.get_feature_maps()
     
@@ -217,6 +208,11 @@ def process_image_with_resnet50(image_path):
     
     print(f'Prediction Output Location: {prediction_output_location}')
 
+    # Get Grad-CAM XAI output of model prediction
+    gradcam = generate_gradcam(xai_resnet50_model, input_tensor, target_layer)
+    superimpose_gradcam(image_path, gradcam, prediction_output_location, file_name)
+
+    # Save "off-ramp" outputs to appropriate folder 
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
         fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
         ax.imshow(feature_map[0, 0].detach().numpy(), cmap='magma')  # Adjust the channel and color map as needed
