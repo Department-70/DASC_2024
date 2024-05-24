@@ -205,7 +205,7 @@ def process_image_with_resnet50(image_path):
     xai_resnet50_model.eval()
     target_layer = xai_resnet50_model.resnet50.layer4[2].conv3  # target the final convolutional layer
     
-    gradcam = generate_gradcam(model, input_tensor, target_layer)
+    gradcam = generate_gradcam(xai_resnet50_model, input_tensor, target_layer)
     superimpose_gradcam(image_path, gradcam)
     
     # Get the feature maps
