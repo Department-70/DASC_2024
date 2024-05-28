@@ -329,7 +329,7 @@ RenderTransformOrigin="0.5,0.5">
                                                 <RotateTransform Angle="360" />
                                             </Rectangle.RenderTransform>
                                         </Rectangle>
-                                        <TextBlock Text="Layer 1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        <TextBlock Text="Stage 1" VerticalAlignment="Center" HorizontalAlignment="Center"
 RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <RotateTransform Angle="270" />
@@ -359,7 +359,7 @@ RenderTransformOrigin="0.5,0.5">
                                                 <RotateTransform Angle="360" />
                                             </Rectangle.RenderTransform>
                                         </Rectangle>
-                                        <TextBlock Text="Layer 2" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        <TextBlock Text="Stage 2" VerticalAlignment="Center" HorizontalAlignment="Center"
 RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <RotateTransform Angle="270" />
@@ -389,7 +389,7 @@ RenderTransformOrigin="0.5,0.5">
                                                 <RotateTransform Angle="360" />
                                             </Rectangle.RenderTransform>
                                         </Rectangle>
-                                        <TextBlock Text="Layer 3" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        <TextBlock Text="Stage 3" VerticalAlignment="Center" HorizontalAlignment="Center"
 RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <RotateTransform Angle="270" />
@@ -419,7 +419,7 @@ RenderTransformOrigin="0.5,0.5">
                                                 <RotateTransform Angle="360" />
                                             </Rectangle.RenderTransform>
                                         </Rectangle>
-                                        <TextBlock Text="Layer 4" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        <TextBlock Text="Stage 4" VerticalAlignment="Center" HorizontalAlignment="Center"
 RenderTransformOrigin="0.5,0.5">
                                             <TextBlock.RenderTransform>
                                                 <RotateTransform Angle="270" />
