@@ -636,8 +636,12 @@ namespace MURDOC.ViewModel
         {
             try
             {
+                string pathToVirtualEnv = @"C:\Users\Windows\miniconda3\envs\murdoc\";
+
                 string pythonDll = Environment.GetEnvironmentVariable("PythonDLL", EnvironmentVariableTarget.User);
                 Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
+                Environment.SetEnvironmentVariable("PYTHONHOME", pathToVirtualEnv, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable("PYTHONPATH", $"{pathToVirtualEnv}\\Lib\\site-packages;{pathToVirtualEnv}\\Lib", EnvironmentVariableTarget.Process);
 
                 // Initialize will fail if configuration manager is not set up or ran with x64 since the above python Dll is 64 bit
                 PythonEngine.Initialize();

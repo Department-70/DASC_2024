@@ -207,6 +207,8 @@ def process_image_with_resnet50(image_path):
         print(f'Skipping {file_name} as prediction output already exists.')
     
     print(f'Prediction Output Location: {prediction_output_location}')
+    
+    os.mkdir(prediction_output_location)
 
     # Get Grad-CAM XAI output of model prediction
     gradcam = generate_gradcam(xai_resnet50_model, input_tensor, target_layer)
@@ -233,7 +235,7 @@ if __name__ == "__main__":
     counter = 1
 
     # Folder containing images
-    image_folder_path = './images/'
+    image_folder_path = 'C:\\Users\\Windows\\Downloads\\images'
     
     # List all images in the folder
     image_files = [os.path.join(image_folder_path, file) for file in os.listdir(image_folder_path) if file.endswith(('jpg', 'jpeg', 'png'))]
