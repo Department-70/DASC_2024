@@ -164,6 +164,10 @@ def process_image_with_resnet50(image_path):
     
     print(f'Prediction Output Location: {prediction_output_location}')
 
+    output_path = os.path.join(prediction_output_location, f'{file_name_without_extension}_prediction.png')
+    plt.imsave(output_path, visualization, cmap='jet')
+    plt.close()
+
     # Save "off-ramp" outputs to appropriate folder 
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
         fig, ax = plt.subplots(figsize=(feature_map.shape[2] / 100, feature_map.shape[1] / 100), dpi=100)
