@@ -136,14 +136,14 @@ def process_image_with_resnet50(image_path):
     input_tensor = preprocess_image(image_path)
     xai_resnet50_model(input_tensor)
     xai_resnet50_model.eval()
-    target_layer = xai_resnet50_model.resnet50.layer4[2].conv3  # target the final convolutional layer
+    target_layer = [xai_resnet50_model.resnet50.layer4[2].conv3]  # target the final convolutional layer
     
     # Convert the input tensor to a numpy array for visualization
     input_image = input_tensor.squeeze(0).permute(1, 2, 0).detach().numpy()
     input_image = (input_image - input_image.min()) / (input_image.max() - input_image.min())  # Normalize to [0, 1]
 
     # Construct the CAM object once, and then re-use it on many images:
-    gradcam = GradCAM(model=model, target_layers=target_layer)
+    gradcam = GradCAM(model=xai_resnet50_model, target_layers=target_layer)
     targets = [ClassifierOutputTarget(281)]
     
     # You can also pass aug_smooth=True and eigen_smooth=True, to apply smoothing.
@@ -157,14 +157,12 @@ def process_image_with_resnet50(image_path):
     feature_maps = xai_resnet50_model.get_feature_maps()
     
     prediction_output_location = os.path.join(output_root, file_name)
-    os.mkdir(prediction_output_location, exist_ok=True)  # Create the directory if it does not exist
-    
-    if os.path.exists(prediction_output_location) and os.listdir(prediction_output_location):
-        print(f'Skipping {file_name} as prediction output already exists.')
+    os.makedirs(prediction_output_location, exist_ok=True)  # Create the directory if it does not exist
     
     print(f'Prediction Output Location: {prediction_output_location}')
 
-    output_path = os.path.join(prediction_output_location, f'{file_name_without_extension}_prediction.png')
+    # Save the Grad-CAM visualization to the output location 
+    output_path = os.path.join(prediction_output_location, f'{file_name}_prediction.png')
     plt.imsave(output_path, visualization, cmap='jet')
     plt.close()
 
