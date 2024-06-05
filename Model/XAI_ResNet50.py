@@ -70,6 +70,17 @@ class XAIResNet50(torch.nn.Module):
     
     def get_feature_maps(self):
         return self.feature_maps
+    
+class XAIFace(torch.nn.Module):
+    def __init__(self):
+        super(XAIFace, self).__init__()
+        
+        # load pre-trained (this code should be the call to the face code)
+        #self.face = models.face(pretrained=True)
+        
+    def forward(self):
+        pass
+        
 
 """
 ===================================================================================================
@@ -207,7 +218,6 @@ def process_image_with_resnet50(image_path):
         print(f'Skipping {file_name} as prediction output already exists.')
     
     print(f'Prediction Output Location: {prediction_output_location}')
-    
     os.mkdir(prediction_output_location)
 
     # Get Grad-CAM XAI output of model prediction

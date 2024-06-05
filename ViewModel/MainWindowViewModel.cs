@@ -637,8 +637,8 @@ namespace MURDOC.ViewModel
             try
             {
                 string pathToVirtualEnv = @"C:\Users\Windows\miniconda3\envs\murdoc\";
-
                 string pythonDll = Environment.GetEnvironmentVariable("PythonDLL", EnvironmentVariableTarget.User);
+
                 Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
                 Environment.SetEnvironmentVariable("PYTHONHOME", pathToVirtualEnv, EnvironmentVariableTarget.Process);
                 Environment.SetEnvironmentVariable("PYTHONPATH", $"{pathToVirtualEnv}\\Lib\\site-packages;{pathToVirtualEnv}\\Lib", EnvironmentVariableTarget.Process);
