@@ -17,6 +17,9 @@ import torch.nn.functional as F
 from torchvision import models, transforms
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
 
 # Folder containing images
 gt_root = './GT/'
@@ -67,6 +70,8 @@ class XAIResNet50(torch.nn.Module):
         features = F.adaptive_avg_pool2d(features, (1, 1))
         features = torch.flatten(features, 1)
         self.predictions = self.resnet50.fc(features)
+
+        return self.predictions
     
     def get_feature_maps(self):
         return self.feature_maps
@@ -98,72 +103,6 @@ def preprocess_image(image_path):
     image_tensor = preprocess(image).unsqueeze(0)  # Add batch dimension
     return image_tensor
 
-"""
-===================================================================================================
-    Hook for the gradients of the target layer
-===================================================================================================
-"""
-class SaveFeatures:
-    def __init__(self, module):
-        self.hook = module.register_forward_hook(self.hook_fn)
-        self.features = None
-        self.gradients = None
-
-    def hook_fn(self, module, input, output):
-        self.features = output
-        self.hook_grad = output.register_hook(self.hook_grad_fn)
-
-    def hook_grad_fn(self, grad):
-        self.gradients = grad
-
-    def close(self):
-        self.hook.remove()
-
-"""
-===================================================================================================
-    Generate Grad_CAM heatmap
-===================================================================================================
-"""
-def generate_gradcam(model, img_tensor, target_layer, target_class=None):
-    sf = SaveFeatures(target_layer)
-    output = model(img_tensor)
-    
-    # Access the predictions directly from the model
-    output = model.predictions
-
-    if target_class is None:
-        target_class = output.argmax().item()
-
-    model.zero_grad()
-    class_loss = F.cross_entropy(output, torch.tensor([target_class]))
-    class_loss.backward()
-
-    gradients = sf.gradients.data.numpy()[0]
-    activations = sf.features.data.numpy()[0]
-    weights = np.mean(gradients, axis=(1, 2))
-    gradcam = np.zeros(activations.shape[1:], dtype=np.float32)
-
-    for i, w in enumerate(weights):
-        gradcam += w * activations[i, :, :]
-
-    gradcam = np.maximum(gradcam, 0)
-    gradcam = gradcam / gradcam.max()
-    gradcam = np.uint8(gradcam * 255)
-    gradcam = Image.fromarray(gradcam).resize((img_tensor.size(2), img_tensor.size(3)), Image.LANCZOS)
-    return gradcam
-
-# Superimpose Grad-CAM heatmap on original image
-def superimpose_gradcam(img_path, gradcam, output_location, file_name):
-    img = Image.open(img_path).convert('RGB')
-    plt.imshow(img)
-    plt.imshow(gradcam, cmap='jet', alpha=0.5)
-    plt.axis('off')
-    
-    # Save the plot without title
-    output_path = f'{output_location}/{file_name}_prediction.png'
-    plt.savefig(output_path, bbox_inches='tight', pad_inches=0)
-    plt.close()  # Close the figure to free up memory
-    
 """
 ===================================================================================================
     Image Preprocessing Helper Functions
@@ -208,21 +147,35 @@ def process_image_with_resnet50(image_path):
     input_tensor = preprocess_image(image_path)
     xai_resnet50_model(input_tensor)
     xai_resnet50_model.eval()
-    target_layer = xai_resnet50_model.resnet50.layer4[2].conv3  # target the final convolutional layer
-            
+    target_layer = [xai_resnet50_model.resnet50.layer4[2].conv3]  # target the final convolutional layer
+    
+    # Convert the input tensor to a numpy array for visualization
+    input_image = input_tensor.squeeze(0).permute(1, 2, 0).detach().numpy()
+    input_image = (input_image - input_image.min()) / (input_image.max() - input_image.min())  # Normalize to [0, 1]
+
+    # Construct the CAM object once, and then re-use it on many images:
+    gradcam = GradCAM(model=xai_resnet50_model, target_layers=target_layer)
+    targets = [ClassifierOutputTarget(281)]
+    
+    # You can also pass aug_smooth=True and eigen_smooth=True, to apply smoothing.
+    grayscale_cam = gradcam(input_tensor=input_tensor, targets=targets)
+    
+    # In this example grayscale_cam has only one image in the batch:
+    grayscale_cam = grayscale_cam[0, :]
+    visualization = show_cam_on_image(input_image, grayscale_cam, use_rgb=True)
+
     # Get the feature maps
     feature_maps = xai_resnet50_model.get_feature_maps()
     
     prediction_output_location = os.path.join(output_root, file_name)
-    if os.path.exists(prediction_output_location) and os.listdir(prediction_output_location):
-        print(f'Skipping {file_name} as prediction output already exists.')
+    os.makedirs(prediction_output_location, exist_ok=True)  # Create the directory if it does not exist
     
     print(f'Prediction Output Location: {prediction_output_location}')
-    os.mkdir(prediction_output_location)
 
-    # Get Grad-CAM XAI output of model prediction
-    gradcam = generate_gradcam(xai_resnet50_model, input_tensor, target_layer)
-    superimpose_gradcam(image_path, gradcam, prediction_output_location, file_name)
+    # Save the Grad-CAM visualization to the output location 
+    output_path = os.path.join(prediction_output_location, f'{file_name}_prediction.png')
+    plt.imsave(output_path, visualization, cmap='jet')
+    plt.close()
 
     # Save "off-ramp" outputs to appropriate folder 
     for key, feature_map in tqdm(feature_maps.items(), desc='Saving Feature Maps'):
