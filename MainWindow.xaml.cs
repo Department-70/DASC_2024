@@ -28,5 +28,18 @@ namespace MURDOC
             // Create an instance of MainWindowViewModel and set it as the DataContext
             DataContext = new MainWindowViewModel();
         }
+
+        private void LocalizationImage_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var imageItem = sender as System.Windows.Controls.Image;
+            if (imageItem != null)
+            {
+                var viewModel = DataContext as MainWindowViewModel;
+                if (viewModel != null)
+                {
+                    viewModel.HandlePreviewImageChanged(imageItem.Source.ToString());
+                }
+            }   
+        }
     }
 }

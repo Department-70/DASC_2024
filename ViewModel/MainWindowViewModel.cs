@@ -19,6 +19,8 @@ namespace MURDOC.ViewModel
 
         private BitmapImage _selectedImage;
 
+        private BitmapImage _previewImage;
+
         private readonly ICommand _exitCommand;
 
         private readonly ICommand _newCommand;
@@ -119,6 +121,19 @@ namespace MURDOC.ViewModel
                 // TODO: Reset all Model Traversal Progress circles to empty
 
                 // TODO: Clear all of the Model Traversal Results - except for Input Image
+            }
+        }
+
+        /// <summary>
+        /// Returns the preview/mouse-over image to be displayed on the GUI.
+        /// </summary>
+        public BitmapImage PreviewImage
+        {
+            get { return _previewImage; }
+            set
+            {
+                _previewImage = value;
+                OnPropertyChanged(nameof(PreviewImage));
             }
         }
 
@@ -748,6 +763,17 @@ namespace MURDOC.ViewModel
                 SelectedImageFileName = Path.GetFileName(SelectedImagePath);
                 SelectedImageName = Path.GetFileNameWithoutExtension(SelectedImagePath);
             }
+        }
+
+        /// <summary>
+        /// Handles the changing of the preview image upon mouse over of a process image.
+        /// </summary>
+        /// <param name="imagePath">The image that is moused over.</param>
+        /// <remarks>
+        /// </remarks>
+        public void HandlePreviewImageChanged(string imagePath)
+        {
+            PreviewImage = new BitmapImage(new Uri(imagePath));
         }
 
         /// <summary>

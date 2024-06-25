@@ -66,7 +66,7 @@
                     <!-- Preview for mouse over -->
                     <StackPanel Orientation="Vertical" Margin="5">
                         <Label Content="Preview" FontWeight="Bold" Margin="5,0,20,0"/>
-                        <Image Source="{Binding SelectedImage}" Margin="5" Stretch="Uniform" MaxWidth="300" Height="Auto" />
+                        <Image Source="{Binding PreviewImage}" Margin="5" Stretch="Uniform" MaxWidth="300" Height="Auto" />
                     </StackPanel>
                 </StackPanel>
 
@@ -87,35 +87,35 @@
 
                                             <StackPanel Orientation="Vertical">
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Conv}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Conv}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter"/>
                                                     <Label Content="Initial Conv" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer1}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer1}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 1" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer2}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer2}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter"/>
                                                     <Label Content="Stage 2" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer3}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer3}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 3" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer4}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer4}" Margin="0" Stretch="Uniform" MaxWidth="60" Height="Auto" HorizontalAlignment="Left"  MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 4" HorizontalAlignment="Center"/>
                                                 </StackPanel>
                                             </StackPanel>
@@ -128,14 +128,14 @@
                                             </StackPanel>
 
                                             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                                <Image Source="{Binding ResNet50Layer4}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="80" Height="Auto" HorizontalAlignment="Center" />
+                                                <Image Source="{Binding ResNet50Layer4}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="80" Height="Auto" HorizontalAlignment="Center" MouseEnter="LocalizationImage_MouseEnter" />
                                                 <Label Content="Fixation Decoder"/>
                                             </StackPanel>
 
                                             <TextBlock FontFamily="Segoe UI Symbol" FontSize="40" FontWeight="Bold" Text="&#x2B46;" VerticalAlignment="Center" Foreground="Black" Margin="0"/>
 
                                             <StackPanel Orientation="Vertical" Margin="5,15,0,0" VerticalAlignment="Center">
-                                                <Image Source="{Binding ResNet50Output}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="80" Height="Auto" HorizontalAlignment="Center" />
+                                                <Image Source="{Binding ResNet50Output}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="80" Height="Auto" HorizontalAlignment="Center" MouseEnter="LocalizationImage_MouseEnter" />
                                                 <Label Content="Grad-Cam Output"  HorizontalAlignment="Center"/>
                                             </StackPanel>
                                         </StackPanel>
@@ -151,35 +151,35 @@
 
                                             <StackPanel Orientation="Vertical">
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Conv}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Conv}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Initial Conv" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer1}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer1}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 1" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer2}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer2}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 2" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer3}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer3}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 3" HorizontalAlignment="Center"/>
                                                 </StackPanel>
 
                                                 <TextBlock FontFamily="Segoe UI Symbol" FontSize="30" FontWeight="Bold" Text="&#x2193;" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="Black" Margin="0"/>
 
                                                 <StackPanel Orientation="Vertical">
-                                                    <Image Source="{Binding ResNet50Layer4}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" />
+                                                    <Image Source="{Binding ResNet50Layer4}" Margin="0" Stretch="Uniform" MaxWidth="75" Height="Auto" HorizontalAlignment="Left" MouseEnter="LocalizationImage_MouseEnter" />
                                                     <Label Content="Stage 4" HorizontalAlignment="Center"/>
                                                 </StackPanel>
                                             </StackPanel>
@@ -192,14 +192,14 @@
                                             </StackPanel>
 
                                             <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                                                <Image Source="{Binding ResNet50Layer4}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Center" />
+                                                <Image Source="{Binding ResNet50Layer4}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Center" MouseEnter="LocalizationImage_MouseEnter" />
                                                 <Label Content="Camouflage Decoder"/>
                                             </StackPanel>
 
                                             <TextBlock FontFamily="Segoe UI Symbol" FontSize="40" FontWeight="Bold" Text="&#x2B46;" VerticalAlignment="Center" Foreground="Black" Margin="0"/>
 
                                             <StackPanel Orientation="Vertical" Margin="5,15,0,0" VerticalAlignment="Center">
-                                                <Image Source="{Binding ResNet50Output}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Center" />
+                                                <Image Source="{Binding ResNet50Output}" Margin="0,0,5,5" Stretch="Uniform" MaxWidth="100" MaxHeight="200" HorizontalAlignment="Center" MouseEnter="LocalizationImage_MouseEnter" />
                                                 <Label Content="Grad-Cam Output"  HorizontalAlignment="Center"/>
                                             </StackPanel>
                                         </StackPanel>
