@@ -372,98 +372,6 @@ namespace MURDOC.ViewModel
             }
         }
 
-        #region Model Traversal Progress circles
-        private string _rn50MPIcircle = "Assets/empty_circle.png";
-        public string RN50MPIcircle
-        {
-            get { return _rn50MPIcircle; }
-            set
-            {
-                _rn50MPIcircle = value;
-                OnPropertyChanged(nameof(RN50MPIcircle));
-            }
-        }
-
-        private string _rn50ResultsCircle = "Assets/empty_circle.png";
-        public string RN50ResultsCircle
-        {
-            get { return _rn50ResultsCircle; }
-            set
-            {
-                _rn50ResultsCircle = value;
-                OnPropertyChanged(nameof(RN50ResultsCircle));
-            }
-        }
-
-        private string _rNetMPIcircle = "Assets/empty_circle.png";
-        public string RNetMPIcircle
-        {
-            get { return _rNetMPIcircle; }
-            set
-            {
-                _rNetMPIcircle = value;
-                OnPropertyChanged(nameof(RNetMPIcircle));
-            }
-        }
-
-        private string _rNetResultsCircle = "Assets/empty_circle.png";
-        public string RNetResultsCircle
-        {
-            get { return _rNetResultsCircle; }
-            set
-            {
-                _rNetResultsCircle = value;
-                OnPropertyChanged(nameof(RNetResultsCircle));
-            }
-        }
-
-        private string _eDD7MPICircle = "Assets/empty_circle.png";
-        public string EDD7MPIcircle
-        {
-            get { return _eDD7MPICircle; }
-            set
-            {
-                _eDD7MPICircle = value;
-                OnPropertyChanged(nameof(EDD7MPIcircle));
-            }
-        }
-
-        private string _eDD7ResultsCircle = "Assets/empty_circle.png";
-        public string EDD7ResultsCircle
-        {
-            get { return _eDD7ResultsCircle; }
-            set
-            {
-                _eDD7ResultsCircle = value;
-                OnPropertyChanged(nameof(EDD7ResultsCircle));
-            }
-        }
-
-        private string _finalResultCircle = "Assets/empty_circle.png";
-        public string FinalResultsCircle
-        {
-            get { return _finalResultCircle; }
-            set
-            {
-                _finalResultCircle = value;
-                OnPropertyChanged(nameof(FinalResultsCircle));
-            }
-        }
-
-        private string _rn50ModelStatus;
-
-        public string RN50ModelStatus
-        {
-            get { return _rn50ModelStatus; }
-            set
-            {
-                _rn50ModelStatus = value;
-                UpdateStepCompletionStatus(); // Update step completion status when model status changes
-                OnPropertyChanged(nameof(RN50ModelStatus));
-            }
-        }
-        #endregion
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -547,9 +455,6 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteRunCommand()
         {
-            // Update the RN50MPIcircle to green circle to show model is running
-            RN50MPIcircle = "Assets/filled_circle.png";
-
             // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected - done: disabled the run models button if no image is selected
 
             // Initialize Python engine
@@ -616,9 +521,6 @@ namespace MURDOC.ViewModel
                     Console.WriteLine("Exception occured: " + exception);
                 }
 
-                // Update the RN50ResultsCircle to green circle to show the model is done
-                RN50ResultsCircle = "Assets/filled_circle.png";
-
                 // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
 
                 // TODO: Run the RankNet model
@@ -636,7 +538,7 @@ namespace MURDOC.ViewModel
         {
             try
             {
-                string pathToVirtualEnv = @"C:\Users\Windows\miniconda3\envs\murdoc\";
+                string pathToVirtualEnv = @"C:\Users\pharm\AppData\Local\Programs\Python\Python39"; //@"C:\Users\pharm\anaconda3\envs\murdoc\";
 
                 string pythonDll = Environment.GetEnvironmentVariable("PythonDLL", EnvironmentVariableTarget.User);
                 Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
@@ -846,23 +748,6 @@ namespace MURDOC.ViewModel
                 SelectedImageFileName = Path.GetFileName(SelectedImagePath);
                 SelectedImageName = Path.GetFileNameWithoutExtension(SelectedImagePath);
             }
-        }
-
-        // In a method where you determine the completion status of each step, set the appropriate image source:
-        private void UpdateStepCompletionStatus()
-        {
-            // Example logic (replace with your actual logic):
-            bool rn50Completed = IsRN50ModelCompleted();
-            RN50MPIcircle = rn50Completed ? "Resources/filled_circle.png" : "Resources/empty_circle.png";
-
-            // Update other step completion properties similarly...
-        }
-
-        // Assuming you have a method to determine the completion status of each step:
-        private bool IsRN50ModelCompleted()
-        {
-            // Example logic to determine if RN50 model is completed
-            return _rn50ModelStatus == "Completed";
         }
 
         /// <summary>
