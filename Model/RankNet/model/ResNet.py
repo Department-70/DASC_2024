@@ -182,9 +182,7 @@ class B2_ResNet(nn.Module):
         self.inplanes = 512
         self.layer3_2 = self._make_layer(Bottleneck, 256, 6, stride=2)
         self.layer4_2 = self._make_layer(Bottleneck, 512, 3, stride=2)
-        
-        self.feature_maps = {}  # Dictionary to store feature maps
-        
+                
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -217,20 +215,15 @@ class B2_ResNet(nn.Module):
         x = self.maxpool(x)
 
         x = self.layer1(x)
-        self.feature_maps['layer1'] = x.clone().detach()  # Save feature map after layer 1
+        
         x = self.layer2(x)
-        self.feature_maps['layer2'] = x.clone().detach()  # Save feature map after layer 2
+        
         x1 = self.layer3_1(x)
-        self.feature_maps['layer3_1'] = x1.clone().detach()  # Save feature map after layer 3_1
+        
         x1 = self.layer4_1(x1)
-        self.feature_maps['layer4_1'] = x1.clone().detach()  # Save feature map after layer 4_1
 
         x2 = self.layer3_2(x)
-        self.feature_maps['layer3_2'] = x2.clone().detach()  # Save feature map after layer 3_2
+        
         x2 = self.layer4_2(x2)
-        self.feature_maps['layer4_2'] = x2.clone().detach()  # Save feature map after layer 4_2
 
         return x1, x2
-
-    def get_feature_maps(self):
-        return self.feature_maps

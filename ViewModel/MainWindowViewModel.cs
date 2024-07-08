@@ -370,6 +370,62 @@ namespace MURDOC.ViewModel
                 }
             }
         }
+
+        private string _rankNetFixationDecoderImagePath;
+        public string RankNetFixationDecoderImagePath
+        {
+            get => _rankNetFixationDecoderImagePath;
+            set
+            {
+                if (_rankNetFixationDecoderImagePath != value)
+                {
+                    _rankNetFixationDecoderImagePath = value;
+                    OnPropertyChanged(nameof(RankNetFixationDecoderImagePath));
+                }
+            }
+        }
+
+        private string _rankNetCamouflageDecoderImagePath;
+        public string RankNetCamouflageDecoderImagePath
+        {
+            get => _rankNetCamouflageDecoderImagePath;
+            set
+            {
+                if (_rankNetCamouflageDecoderImagePath != value) 
+                { 
+                    _rankNetCamouflageDecoderImagePath = value;
+                    OnPropertyChanged(nameof(RankNetCamouflageDecoderImagePath));
+                }
+            }
+        }
+
+        private string _facePredictionImagePath;
+        public string FACEPredictionImagePath
+        {
+            get => _facePredictionImagePath;
+            set 
+            {
+                if (_facePredictionImagePath != value)
+                {
+                    _facePredictionImagePath = value;
+                    OnPropertyChanged(nameof(FACEPredictionImagePath));
+                }
+            }
+        }
+
+        private string _weakAreaCamoImagePath;
+        public string WeakAreaCamoImagePath
+        {
+            get => _weakAreaCamoImagePath;
+            set
+            {
+                if (_weakAreaCamoImagePath != value) 
+                { 
+                    _weakAreaCamoImagePath = value;
+                    OnPropertyChanged(nameof(WeakAreaCamoImagePath));
+                }
+            }
+        }
         #endregion
 
         /// <summary>
@@ -526,9 +582,26 @@ namespace MURDOC.ViewModel
                     ResNet50Layer4ImagePath = layer4ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer4));
 
+                    string fixationDecoderImagePath = Path.Combine(folderPath, _selectedImageName + "_fixation_decoder.png");
+                    RankNetFixationDecoderImagePath = fixationDecoderImagePath;
+                    OnPropertyChanged(nameof(RankNetFixationDecoderImagePath));
+
+                    string camouflageDecoderImagePath = Path.Combine(folderPath, _selectedImageName + "_camouflage_decoder.png");
+                    RankNetCamouflageDecoderImagePath = camouflageDecoderImagePath;
+                    OnPropertyChanged(nameof(RankNetCamouflageDecoderImagePath));
+
+                    string weakAreaCamoImagePath = Path.Combine(folderPath, _selectedImageName + "_weak_area_camo.png");
+                    WeakAreaCamoImagePath = weakAreaCamoImagePath;
+                    OnPropertyChanged(nameof(WeakAreaCamoImagePath));
+
+                    string facePredictionImagePath = Path.Combine(folderPath, "segmented_" + _selectedImageName + ".jpg");
+                    FACEPredictionImagePath = facePredictionImagePath;
+                    OnPropertyChanged(nameof(FACEPredictionImagePath));
+
                     string outputImagePath = Path.Combine(folderPath, _selectedImageName + "_prediction.png");
                     ResNet50OutputImagePath = outputImagePath;
                     OnPropertyChanged(nameof(ResNet50Output));
+
                 }
                 catch (PythonException exception)
                 {
@@ -536,13 +609,6 @@ namespace MURDOC.ViewModel
                     Console.WriteLine("Exception occured: " + exception);
                 }
 
-                // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
-
-                // TODO: Run the RankNet model
-
-                // TODO: Run the EfficientDetD7 model
-
-                // TODO: Display the final prediction
             }
         }
 
