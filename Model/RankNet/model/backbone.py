@@ -76,8 +76,6 @@ class CAM_Module(nn.Module):
         self.gamma = Parameter(torch.zeros(1))
         self.softmax  = Softmax(dim=-1)
         
-        self.feature_maps = {}  # Dictionary to store feature maps
-        
     def forward(self,x):
         """
             inputs :
@@ -98,15 +96,8 @@ class CAM_Module(nn.Module):
         out = out.view(m_batchsize, C, height, width)
 
         out = self.gamma*out + x
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['attention_output'] = out
-        
+                
         return out
-
-    def get_feature_maps(self):
-        return self.feature_maps
     
 
 """
@@ -145,9 +136,7 @@ class PAM_Module(nn.Module):
         self.value_conv = nn.Conv2d(in_channels=in_dim, out_channels=in_dim, kernel_size=1)
         self.gamma = Parameter(torch.zeros(1))
         self.softmax = Softmax(dim=-1)
-        
-        self.feature_maps = {}  # Dictionary to store feature maps
-
+       
     def forward(self, x):
         """
             inputs :
@@ -167,15 +156,8 @@ class PAM_Module(nn.Module):
         out = out.view(m_batchsize, C, height, width)
 
         out = self.gamma*out + x
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['attention_output'] = out
-            
+                    
         return out
-
-    def get_feature_maps(self):
-        return self.feature_maps
 
 
 """
@@ -258,22 +240,11 @@ class CALayer(nn.Module):
                 nn.Sigmoid()
         )
         
-        self.feature_maps = {}  # Dictionary to store feature maps
-
     def forward(self, x):
-        y = self.avg_pool(x)
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['global_avg_pooling'] = y
-        self.feature_maps['channel_weights'] = y
-        
+        y = self.avg_pool(x)        
         y = self.conv_du(y)
         
         return x * y
-
-    def get_feature_maps(self):
-        return self.feature_maps
     
 
 """
@@ -325,8 +296,6 @@ class RCAB(nn.Module):
         modules_body.append(CALayer(n_feat, reduction))
         self.body = nn.Sequential(*modules_body)
         self.res_scale = res_scale
-        
-        self.feature_maps = {}  # Dictionary to store feature maps
 
     def default_conv(self, in_channels, out_channels, kernel_size, bias=True):
         return nn.Conv2d(in_channels, out_channels, kernel_size,padding=(kernel_size // 2), bias=bias)
@@ -334,18 +303,10 @@ class RCAB(nn.Module):
     def forward(self, x):
         res = self.body(x)
         #res = self.body(x).mul(self.res_scale)
-                
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['output_feature'] = res
-        self.feature_maps['residual_connection'] = x + res
         
         res += x
         
         return res
-
-    def get_feature_maps(self):
-        return self.feature_maps
     
 
 """
@@ -398,8 +359,6 @@ class Saliency_feat_encoder(nn.Module):
         
         if self.training:
             self.initialize_weights()
-            
-        self.feature_maps = {}  # Dictionary to store feature maps
 
     def _make_pred_layer(self, block, dilation_series, padding_series, NoLabels, input_channel):
         return block(dilation_series, padding_series, NoLabels, input_channel)
@@ -413,42 +372,24 @@ class Saliency_feat_encoder(nn.Module):
         x2 = self.resnet.layer2(x1)  # 512 x 32 x 32
         x3 = self.resnet.layer3_1(x2)  # 1024 x 16 x 16
         x4 = self.resnet.layer4_1(x3)  # 2048 x 8 x 8
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['x1'] = x1
-        self.feature_maps['x2'] = x2
-        self.feature_maps['x3'] = x3
-        self.feature_maps['x4'] = x4
 
         conv5_feat = self.layer5(x4)
         
         # put position attention at bottleneck of network
         conv5_feat = self.pam_attention(conv5_feat)
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['conv5_feat'] = conv5_feat
-        
+                
         # put channel attention at bottleneck of network
         # conv5_feat = self.cam_attention(conv5_feat)
         conv2_feat = self.conv2(x2)
         conv3_feat = self.upsample2(self.conv3(x3))
         conv4_feat = self.upsample2(self.conv4(x4))
         conv5_feat = self.upsample2(conv5_feat)
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['conv2_feat'] = conv2_feat
-        self.feature_maps['conv3_feat'] = conv3_feat
-        self.feature_maps['conv4_feat'] = conv4_feat
-        self.feature_maps['conv5_feat_upsampled'] = conv5_feat
 
         cat_feat = self.relu(torch.cat((conv2_feat, conv3_feat, conv4_feat, conv5_feat), 1))
 
         # residual channel attention
         cat_feat = self.racb_layer(cat_feat)
         cat_feat = self.layer6(cat_feat)
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['cat_feat'] = cat_feat
 
         return self.upsample(cat_feat)
 
@@ -470,6 +411,3 @@ class Saliency_feat_encoder(nn.Module):
                 all_params[k] = v
         assert len(all_params.keys()) == len(self.resnet.state_dict().keys())
         self.resnet.load_state_dict(all_params)
-
-    def get_feature_maps(self):
-        return self.feature_maps

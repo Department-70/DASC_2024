@@ -19,6 +19,8 @@ namespace MURDOC.ViewModel
 
         private BitmapImage _selectedImage;
 
+        private BitmapImage _previewImage;
+
         private readonly ICommand _exitCommand;
 
         private readonly ICommand _newCommand;
@@ -119,6 +121,19 @@ namespace MURDOC.ViewModel
                 // TODO: Reset all Model Traversal Progress circles to empty
 
                 // TODO: Clear all of the Model Traversal Results - except for Input Image
+            }
+        }
+
+        /// <summary>
+        /// Returns the preview/mouse-over image to be displayed on the GUI.
+        /// </summary>
+        public BitmapImage PreviewImage
+        {
+            get { return _previewImage; }
+            set
+            {
+                _previewImage = value;
+                OnPropertyChanged(nameof(PreviewImage));
             }
         }
 
@@ -355,6 +370,62 @@ namespace MURDOC.ViewModel
                 }
             }
         }
+
+        private string _rankNetFixationDecoderImagePath;
+        public string RankNetFixationDecoderImagePath
+        {
+            get => _rankNetFixationDecoderImagePath;
+            set
+            {
+                if (_rankNetFixationDecoderImagePath != value)
+                {
+                    _rankNetFixationDecoderImagePath = value;
+                    OnPropertyChanged(nameof(RankNetFixationDecoderImagePath));
+                }
+            }
+        }
+
+        private string _rankNetCamouflageDecoderImagePath;
+        public string RankNetCamouflageDecoderImagePath
+        {
+            get => _rankNetCamouflageDecoderImagePath;
+            set
+            {
+                if (_rankNetCamouflageDecoderImagePath != value) 
+                { 
+                    _rankNetCamouflageDecoderImagePath = value;
+                    OnPropertyChanged(nameof(RankNetCamouflageDecoderImagePath));
+                }
+            }
+        }
+
+        private string _facePredictionImagePath;
+        public string FACEPredictionImagePath
+        {
+            get => _facePredictionImagePath;
+            set 
+            {
+                if (_facePredictionImagePath != value)
+                {
+                    _facePredictionImagePath = value;
+                    OnPropertyChanged(nameof(FACEPredictionImagePath));
+                }
+            }
+        }
+
+        private string _weakAreaCamoImagePath;
+        public string WeakAreaCamoImagePath
+        {
+            get => _weakAreaCamoImagePath;
+            set
+            {
+                if (_weakAreaCamoImagePath != value) 
+                { 
+                    _weakAreaCamoImagePath = value;
+                    OnPropertyChanged(nameof(WeakAreaCamoImagePath));
+                }
+            }
+        }
         #endregion
 
         /// <summary>
@@ -371,98 +442,6 @@ namespace MURDOC.ViewModel
                 OnPropertyChanged(nameof(IsRunButtonEnabled));
             }
         }
-
-        #region Model Traversal Progress circles
-        private string _rn50MPIcircle = "Assets/empty_circle.png";
-        public string RN50MPIcircle
-        {
-            get { return _rn50MPIcircle; }
-            set
-            {
-                _rn50MPIcircle = value;
-                OnPropertyChanged(nameof(RN50MPIcircle));
-            }
-        }
-
-        private string _rn50ResultsCircle = "Assets/empty_circle.png";
-        public string RN50ResultsCircle
-        {
-            get { return _rn50ResultsCircle; }
-            set
-            {
-                _rn50ResultsCircle = value;
-                OnPropertyChanged(nameof(RN50ResultsCircle));
-            }
-        }
-
-        private string _rNetMPIcircle = "Assets/empty_circle.png";
-        public string RNetMPIcircle
-        {
-            get { return _rNetMPIcircle; }
-            set
-            {
-                _rNetMPIcircle = value;
-                OnPropertyChanged(nameof(RNetMPIcircle));
-            }
-        }
-
-        private string _rNetResultsCircle = "Assets/empty_circle.png";
-        public string RNetResultsCircle
-        {
-            get { return _rNetResultsCircle; }
-            set
-            {
-                _rNetResultsCircle = value;
-                OnPropertyChanged(nameof(RNetResultsCircle));
-            }
-        }
-
-        private string _eDD7MPICircle = "Assets/empty_circle.png";
-        public string EDD7MPIcircle
-        {
-            get { return _eDD7MPICircle; }
-            set
-            {
-                _eDD7MPICircle = value;
-                OnPropertyChanged(nameof(EDD7MPIcircle));
-            }
-        }
-
-        private string _eDD7ResultsCircle = "Assets/empty_circle.png";
-        public string EDD7ResultsCircle
-        {
-            get { return _eDD7ResultsCircle; }
-            set
-            {
-                _eDD7ResultsCircle = value;
-                OnPropertyChanged(nameof(EDD7ResultsCircle));
-            }
-        }
-
-        private string _finalResultCircle = "Assets/empty_circle.png";
-        public string FinalResultsCircle
-        {
-            get { return _finalResultCircle; }
-            set
-            {
-                _finalResultCircle = value;
-                OnPropertyChanged(nameof(FinalResultsCircle));
-            }
-        }
-
-        private string _rn50ModelStatus;
-
-        public string RN50ModelStatus
-        {
-            get { return _rn50ModelStatus; }
-            set
-            {
-                _rn50ModelStatus = value;
-                UpdateStepCompletionStatus(); // Update step completion status when model status changes
-                OnPropertyChanged(nameof(RN50ModelStatus));
-            }
-        }
-        #endregion
 
         /// <summary>
         /// Constructor
@@ -547,9 +526,6 @@ namespace MURDOC.ViewModel
         /// </summary>
         private void ExecuteRunCommand()
         {
-            // Update the RN50MPIcircle to green circle to show model is running
-            RN50MPIcircle = "Assets/filled_circle.png";
-
             // Need to handle the scenario by preventing the run when SelectedImagePath has no image selected - done: disabled the run models button if no image is selected
 
             // Initialize Python engine
@@ -606,9 +582,26 @@ namespace MURDOC.ViewModel
                     ResNet50Layer4ImagePath = layer4ImagePath;
                     OnPropertyChanged(nameof(ResNet50Layer4));
 
+                    string fixationDecoderImagePath = Path.Combine(folderPath, _selectedImageName + "_fixation_decoder.png");
+                    RankNetFixationDecoderImagePath = fixationDecoderImagePath;
+                    OnPropertyChanged(nameof(RankNetFixationDecoderImagePath));
+
+                    string camouflageDecoderImagePath = Path.Combine(folderPath, _selectedImageName + "_camouflage_decoder.png");
+                    RankNetCamouflageDecoderImagePath = camouflageDecoderImagePath;
+                    OnPropertyChanged(nameof(RankNetCamouflageDecoderImagePath));
+
+                    string weakAreaCamoImagePath = Path.Combine(folderPath, _selectedImageName + "_weak_area_camo.png");
+                    WeakAreaCamoImagePath = weakAreaCamoImagePath;
+                    OnPropertyChanged(nameof(WeakAreaCamoImagePath));
+
+                    string facePredictionImagePath = Path.Combine(folderPath, "segmented_" + _selectedImageName + ".jpg");
+                    FACEPredictionImagePath = facePredictionImagePath;
+                    OnPropertyChanged(nameof(FACEPredictionImagePath));
+
                     string outputImagePath = Path.Combine(folderPath, _selectedImageName + "_prediction.png");
                     ResNet50OutputImagePath = outputImagePath;
                     OnPropertyChanged(nameof(ResNet50Output));
+
                 }
                 catch (PythonException exception)
                 {
@@ -616,16 +609,6 @@ namespace MURDOC.ViewModel
                     Console.WriteLine("Exception occured: " + exception);
                 }
 
-                // Update the RN50ResultsCircle to green circle to show the model is done
-                RN50ResultsCircle = "Assets/filled_circle.png";
-
-                // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
-
-                // TODO: Run the RankNet model
-
-                // TODO: Run the EfficientDetD7 model
-
-                // TODO: Display the final prediction
             }
         }
 
@@ -848,21 +831,15 @@ namespace MURDOC.ViewModel
             }
         }
 
-        // In a method where you determine the completion status of each step, set the appropriate image source:
-        private void UpdateStepCompletionStatus()
+        /// <summary>
+        /// Handles the changing of the preview image upon mouse over of a process image.
+        /// </summary>
+        /// <param name="imagePath">The image that is moused over.</param>
+        /// <remarks>
+        /// </remarks>
+        public void HandlePreviewImageChanged(string imagePath)
         {
-            // Example logic (replace with your actual logic):
-            bool rn50Completed = IsRN50ModelCompleted();
-            RN50MPIcircle = rn50Completed ? "Resources/filled_circle.png" : "Resources/empty_circle.png";
-
-            // Update other step completion properties similarly...
-        }
-
-        // Assuming you have a method to determine the completion status of each step:
-        private bool IsRN50ModelCompleted()
-        {
-            // Example logic to determine if RN50 model is completed
-            return _rn50ModelStatus == "Completed";
+            PreviewImage = new BitmapImage(new Uri(imagePath));
         }
 
         /// <summary>
