@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Mixed Understanding Recognition and Detection Of Camouflage (MURDOC)" 
         Height="990" Width="1860"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen">
     <DockPanel>
         <!-- Your window content here -->
