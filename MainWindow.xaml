@@ -67,6 +67,12 @@
                         <Label Content="Preview" FontWeight="Bold" Margin="5,0,20,0"/>
                         <Image Source="{Binding PreviewImage}" Margin="5" Stretch="Uniform" Width="Auto" MaxHeight="225" />
                     </StackPanel>
+                    
+                    <!-- IAI Output Message -->
+                    <StackPanel Orientation="Vertical" Margin="5">
+                        <Label Content="Informative AI Output" FontWeight="Bold" Margin="5,0,20,0"/>
+                        <TextBlock Text="{Binding IAIOutputMessage}" />
+                    </StackPanel>
                 </StackPanel>
 
 
@@ -217,17 +223,9 @@
                                 <DockPanel>
 
                                     <StackPanel Orientation="Vertical">
-                                        <TextBlock Text="Object present." Margin="5,2"/>
-
-                                        <TextBlock Text="1 weak area of camouflage." Margin="5,2"/>
-
                                         <Image Source="{Binding WeakAreaCamoImagePath}" Margin="10" Stretch="Uniform" MaxWidth="200" Height="Auto" HorizontalAlignment="Center" />
 
-                                        <TextBlock Text="Object's mouth:    15.79%" Margin="5,2"/>
-
-                                        <TextBlock Text="Object's eye:    5.48%" Margin="5,2"/>
-
-                                        <TextBlock Text="Object's body:    78.73%" Margin="5,2"/>
+                                        <TextBlock Text="{Binding WeakAreaCamoDescription}" Margin="5,2"/>
                                     </StackPanel>
                                     
                                     

@@ -57,12 +57,26 @@ namespace MURDOC.ViewModel
 
         #endregion
 
+        private string _iaiOutputMessage;
         private string _selectedImagePath;
         private int _sliderBrightness;
         private int _sliderContrast;
         private int _sliderSaturation;
         private MemoryStream _modifiedImageStream;
         private bool hasUserModifiedImage;
+
+        /// <summary>
+        /// Getter/Setter for the IAI Output Message
+        /// </summary>
+        public string IAIOutputMessage
+        {
+            get { return _iaiOutputMessage; }
+            set 
+            { 
+                _iaiOutputMessage = value;
+                OnPropertyChanged(nameof(IAIOutputMessage));
+            }
+        }
 
         /// <summary>
         /// Getter/Setter for the user selected image path.
@@ -540,23 +554,24 @@ namespace MURDOC.ViewModel
                 dynamic os = Py.Import("os");
 
                 // Add the directory containing your Python script to Python's sys.path
-                string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Model", "XAI_ResNet50.py");
+                string scriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\", "Model", "IAI_Decision_Hierarchy.py");
                 sys.path.append(os.path.dirname(scriptPath));
 
                 // ResNet50
                 try
                 {
                     // Import your Python script module
-                    dynamic script = Py.Import("XAI_ResNet50");
+                    dynamic script = Py.Import("IAI_Decision_Hierarchy");
 
                     // Save Temporary Image if user modified
                     string tempImageLocation = SaveTemporaryImage();
                     string imageLocation = string.IsNullOrEmpty(tempImageLocation) ? SelectedImagePath : tempImageLocation;
 
-                    // Call the process_image_with_resnet50 function from your Python script
-                    script.process_image_with_resnet50(imageLocation);
+                    // Call the iaiDecision_test function from your Python script
+                    string message = script.iaiDecision_test(imageLocation); //IAIOutputMessage
+                    IAIOutputMessage = message;
+                    OnPropertyChanged(nameof(IAIOutputMessage));
 
-                    // TODO: Load the Off-ramp images
                     string executableDir = AppDomain.CurrentDomain.BaseDirectory;
                     string folderPath = Path.Combine(executableDir, "resnet50_output", _selectedImageName);
 
@@ -601,6 +616,8 @@ namespace MURDOC.ViewModel
                     string outputImagePath = Path.Combine(folderPath, _selectedImageName + "_prediction.png");
                     ResNet50OutputImagePath = outputImagePath;
                     OnPropertyChanged(nameof(ResNet50Output));
+
+                    
 
                 }
                 catch (PythonException exception)
