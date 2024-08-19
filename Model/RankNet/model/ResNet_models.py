@@ -507,6 +507,7 @@ class Fix_feat_decoder(nn.Module):
 ===================================================================================================
 """
 class Saliency_feat_encoder(nn.Module):
+    # resnet based encoder decoder
     def __init__(self, channel):
         super(Saliency_feat_encoder, self).__init__()
         self.resnet = B2_ResNet()
@@ -524,6 +525,7 @@ class Saliency_feat_encoder(nn.Module):
         if self.training:
             self.initialize_weights()
 
+
     def forward(self, x):
         x = self.resnet.conv1(x)
         x = self.resnet.bn1(x)
@@ -533,7 +535,13 @@ class Saliency_feat_encoder(nn.Module):
         x2 = self.resnet.layer2(x1)  # 512 x 32 x 32
         x3 = self.resnet.layer3_1(x2)  # 1024 x 16 x 16
         x4 = self.resnet.layer4_1(x3)  # 2048 x 8 x 8
-
+                
+        # Saving intermediate feature maps as images
+        self.save_feature_maps(x1, 'x1')
+        self.save_feature_maps(x2, 'x2')
+        self.save_feature_maps(x3, 'x3')
+        self.save_feature_maps(x4, 'x4')
+        
         fix_pred = self.cod_dec(x1,x2,x3,x4)
         init_pred = self.sal_dec(x1,x2,x3,x4)
 
@@ -541,7 +549,13 @@ class Saliency_feat_encoder(nn.Module):
         x3_2 = self.resnet.layer3_2(x2_2)  # 1024 x 16 x 16
         x4_2 = self.resnet.layer4_2(x3_2)  # 2048 x 8 x 8
         ref_pred = self.sal_dec(x1,x2_2,x3_2,x4_2)
-
+        
+        # Saving intermediate feature maps as images
+        self.save_feature_maps(x2_2, 'x2_2')
+        self.save_feature_maps(x3_2, 'x3_2')
+        self.save_feature_maps(x4_2, 'x4_2')
+        self.save_feature_maps(ref_pred, 'ref_pred')
+                
         return self.upsample4(fix_pred),self.upsample4(init_pred),self.upsample4(ref_pred)
 
     def initialize_weights(self):
@@ -562,3 +576,21 @@ class Saliency_feat_encoder(nn.Module):
                 all_params[k] = v
         assert len(all_params.keys()) == len(self.resnet.state_dict().keys())
         self.resnet.load_state_dict(all_params)
+  
+    def save_feature_maps(self, feature_map, feature_name):
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_dir = f"offramp_output_images/{timestamp}_{feature_name}"
+        os.makedirs(save_dir, exist_ok=True)
+        
+        # Convert to numpy and take the first item in the batch
+        feature_map_np = feature_map.detach().cpu().numpy()[0]
+        
+        # Aggregate across channels
+        aggregated_feature = np.mean(feature_map_np, axis=0)
+        
+        # Normalize to [0, 1] range
+        aggregated_feature = (aggregated_feature - aggregated_feature.min()) / (aggregated_feature.max() - aggregated_feature.min())
+        
+        # Save the aggregated feature map
+        save_path = os.path.join(save_dir, f'{feature_name}_aggregated.png')
+        plt.imsave(save_path, aggregated_feature, cmap='viridis')
