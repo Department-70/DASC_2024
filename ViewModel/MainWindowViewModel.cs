@@ -619,13 +619,6 @@ namespace MURDOC.ViewModel
                 // Update the RN50ResultsCircle to green circle to show the model is done
                 RN50ResultsCircle = "Assets/filled_circle.png";
 
-                // TODO: Populate the ResNetConv, ResNet50Block1-4, and ResNet50Output images
-
-                // TODO: Run the RankNet model
-
-                // TODO: Run the EfficientDetD7 model
-
-                // TODO: Display the final prediction
             }
         }
 
@@ -636,7 +629,7 @@ namespace MURDOC.ViewModel
         {
             try
             {
-                string pathToVirtualEnv = @"C:\Users\Windows\miniconda3\envs\murdoc\";
+                string pathToVirtualEnv = @"C:\Users\pharm\AppData\Local\Programs\Python\Python39"; //@"C:\Users\pharm\anaconda3\envs\murdoc\";
 
                 string pythonDll = Environment.GetEnvironmentVariable("PythonDLL", EnvironmentVariableTarget.User);
                 Environment.SetEnvironmentVariable("PYTHONNET_PYDLL", pythonDll);
