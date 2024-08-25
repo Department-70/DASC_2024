@@ -43,17 +43,27 @@ class Generator(nn.Module):
     def __init__(self, channel):
         super(Generator, self).__init__()
         self.sal_encoder = Saliency_feat_encoder(channel)
-
+        self.feature_maps = {} # Added to collect "off-ramp" images
 
     def forward(self, x):
+
         fix_pred, cod_pred1, cod_pred2 = self.sal_encoder(x)
         fix_pred = F.upsample(fix_pred, size=(x.shape[2], x.shape[3]), mode='bilinear',
                                         align_corners=True)
+        self.feature_maps['fixation_map'] = fix_pred.clone().detach()
+        
         cod_pred1 = F.upsample(cod_pred1, size=(x.shape[2], x.shape[3]), mode='bilinear',
                               align_corners=True)
+        self.feature_maps['cod_pred1'] = cod_pred1.clone().detach()
+        
         cod_pred2 = F.upsample(cod_pred2, size=(x.shape[2], x.shape[3]), mode='bilinear',
                               align_corners=True)
+        self.feature_maps['cod_pred2'] = cod_pred2.clone().detach()
+        
         return fix_pred, cod_pred1, cod_pred2
+    
+    def get_feature_maps(self):
+        return self.feature_maps
 
 
 """
@@ -93,8 +103,6 @@ class PAM_Module(nn.Module):
         self.gamma = Parameter(torch.zeros(1))
         self.softmax = Softmax(dim=-1)
         
-        self.feature_maps = {}  # Dictionary to store feature maps
-        
     def forward(self, x):
         """
             inputs :
@@ -115,14 +123,7 @@ class PAM_Module(nn.Module):
 
         out = self.gamma*out + x
         
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['attention_output'] = out
-        
         return out
-    
-    def get_feature_maps(self):
-        return self.feature_maps
 
 
 """
@@ -204,23 +205,13 @@ class CALayer(nn.Module):
                 nn.Conv2d(channel // reduction, channel, 1, padding=0, bias=True),
                 nn.Sigmoid()
         )
-        
-        self.feature_maps = {}  # Dictionary to store feature maps
 
     def forward(self, x):
         y = self.avg_pool(x)
         
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['global_avg_pooling'] = y
-        self.feature_maps['channel_weights'] = y
-        
         y = self.conv_du(y)
         
         return x * y
-    
-    def get_feature_maps(self):
-        return self.feature_maps
     
 
 """
@@ -273,26 +264,16 @@ class RCAB(nn.Module):
         self.body = nn.Sequential(*modules_body)
         self.res_scale = res_scale
         
-        self.feature_maps = {}  # Dictionary to store feature maps
-        
     def default_conv(self, in_channels, out_channels, kernel_size, bias=True):
         return nn.Conv2d(in_channels, out_channels, kernel_size,padding=(kernel_size // 2), bias=bias)
 
     def forward(self, x):
         res = self.body(x)
         #res = self.body(x).mul(self.res_scale)
-                
-        # Store feature maps in the dictionary
-        self.feature_maps['input_feature'] = x
-        self.feature_maps['output_feature'] = res
-        self.feature_maps['residual_connection'] = x + res
-        
+                        
         res += x
         
         return res
-    
-    def get_feature_maps(self):
-        return self.feature_maps
 
 
 """
@@ -412,8 +393,6 @@ class Saliency_feat_decoder(nn.Module):
         self.conv4321 = self._make_pred_layer(Classifier_Module, [3, 6, 12, 18], [3, 6, 12, 18], channel, 4*channel)
 
         self.cls_layer = self._make_pred_layer(Classifier_Module, [6, 12, 18, 24], [6, 12, 18, 24], 1, channel * 4)
-
-        self.feature_maps = {}  # Dictionary to store feature maps
         
 
     def _make_pred_layer(self, block, dilation_series, padding_series, NoLabels, input_channel):
@@ -442,19 +421,7 @@ class Saliency_feat_decoder(nn.Module):
 
         sal_pred = self.cls_layer(conv4321)
 
-        # Store feature maps in the dictionary
-        self.feature_maps['conv1_feat'] = conv1_feat
-        self.feature_maps['conv2_feat'] = conv2_feat
-        self.feature_maps['conv3_feat'] = conv3_feat
-        self.feature_maps['conv4_feat'] = conv4_feat
-        self.feature_maps['conv43'] = conv43
-        self.feature_maps['conv432'] = conv432
-        self.feature_maps['conv4321'] = conv4321
-
         return sal_pred
-    
-    def get_feature_maps(self):
-        return self.feature_maps
     
 
 """
@@ -496,10 +463,7 @@ class Fix_feat_decoder(nn.Module):
 
         self.racb4 = RCAB(channel * 4)
 
-        self.cls_layer = self._make_pred_layer(Classifier_Module, [6, 12, 18, 24], [6, 12, 18, 24], 1, channel * 4)
-
-        self.feature_maps = {}  # Dictionary to store feature maps
-        
+        self.cls_layer = self._make_pred_layer(Classifier_Module, [6, 12, 18, 24], [6, 12, 18, 24], 1, channel * 4)        
 
     def _make_pred_layer(self, block, dilation_series, padding_series, NoLabels, input_channel):
         return block(dilation_series, padding_series, NoLabels, input_channel)
@@ -516,18 +480,8 @@ class Fix_feat_decoder(nn.Module):
         conv4321 = self.racb4(conv4321)
 
         sal_pred = self.cls_layer(conv4321)
-        
-        # Store feature maps in the dictionary
-        self.feature_maps['conv1_feat'] = conv1_feat
-        self.feature_maps['conv2_feat'] = conv2_feat
-        self.feature_maps['conv3_feat'] = conv3_feat
-        self.feature_maps['conv4_feat'] = conv4_feat
-        self.feature_maps['conv4321'] = conv4321
 
         return sal_pred
-
-    def get_feature_maps(self):
-        return self.feature_maps
 
 
 """
@@ -553,6 +507,7 @@ class Fix_feat_decoder(nn.Module):
 ===================================================================================================
 """
 class Saliency_feat_encoder(nn.Module):
+    # resnet based encoder decoder
     def __init__(self, channel):
         super(Saliency_feat_encoder, self).__init__()
         self.resnet = B2_ResNet()
@@ -569,8 +524,7 @@ class Saliency_feat_encoder(nn.Module):
 
         if self.training:
             self.initialize_weights()
-        
-        self.feature_maps = {}  # Dictionary to store feature maps
+
 
     def forward(self, x):
         x = self.resnet.conv1(x)
@@ -581,7 +535,13 @@ class Saliency_feat_encoder(nn.Module):
         x2 = self.resnet.layer2(x1)  # 512 x 32 x 32
         x3 = self.resnet.layer3_1(x2)  # 1024 x 16 x 16
         x4 = self.resnet.layer4_1(x3)  # 2048 x 8 x 8
-
+                
+        # Saving intermediate feature maps as images
+        self.save_feature_maps(x1, 'x1')
+        self.save_feature_maps(x2, 'x2')
+        self.save_feature_maps(x3, 'x3')
+        self.save_feature_maps(x4, 'x4')
+        
         fix_pred = self.cod_dec(x1,x2,x3,x4)
         init_pred = self.sal_dec(x1,x2,x3,x4)
 
@@ -590,15 +550,12 @@ class Saliency_feat_encoder(nn.Module):
         x4_2 = self.resnet.layer4_2(x3_2)  # 2048 x 8 x 8
         ref_pred = self.sal_dec(x1,x2_2,x3_2,x4_2)
         
-        # Store feature maps in the dictionary
-        self.feature_maps['x1'] = x1
-        self.feature_maps['x2'] = x2
-        self.feature_maps['x3'] = x3
-        self.feature_maps['x4'] = x4
-        self.feature_maps['x2_2'] = x2_2
-        self.feature_maps['x3_2'] = x3_2
-        self.feature_maps['x4_2'] = x4_2
-
+        # Saving intermediate feature maps as images
+        self.save_feature_maps(x2_2, 'x2_2')
+        self.save_feature_maps(x3_2, 'x3_2')
+        self.save_feature_maps(x4_2, 'x4_2')
+        self.save_feature_maps(ref_pred, 'ref_pred')
+                
         return self.upsample4(fix_pred),self.upsample4(init_pred),self.upsample4(ref_pred)
 
     def initialize_weights(self):
@@ -619,6 +576,21 @@ class Saliency_feat_encoder(nn.Module):
                 all_params[k] = v
         assert len(all_params.keys()) == len(self.resnet.state_dict().keys())
         self.resnet.load_state_dict(all_params)
-
-    def get_feature_maps(self):
-        return self.feature_maps
+  
+    def save_feature_maps(self, feature_map, feature_name):
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_dir = f"offramp_output_images/{timestamp}_{feature_name}"
+        os.makedirs(save_dir, exist_ok=True)
+        
+        # Convert to numpy and take the first item in the batch
+        feature_map_np = feature_map.detach().cpu().numpy()[0]
+        
+        # Aggregate across channels
+        aggregated_feature = np.mean(feature_map_np, axis=0)
+        
+        # Normalize to [0, 1] range
+        aggregated_feature = (aggregated_feature - aggregated_feature.min()) / (aggregated_feature.max() - aggregated_feature.min())
+        
+        # Save the aggregated feature map
+        save_path = os.path.join(save_dir, f'{feature_name}_aggregated.png')
+        plt.imsave(save_path, aggregated_feature, cmap='viridis')
